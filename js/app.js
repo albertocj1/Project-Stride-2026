@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
   
-    // Define your new backend API URL here
-    const API_BASE = (window.API_BASE || 'https://api.projectstride.ph').replace(/\/+$/, '');
+    // Linked directly to your live Render backend
+    const API_BASE = (window.API_BASE || 'https://project-stride-2026.onrender.com').replace(/\/+$/, '');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
     // --- Utilities ---
