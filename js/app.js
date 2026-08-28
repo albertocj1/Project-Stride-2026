@@ -283,31 +283,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const finishBtn = $('close-submitted');
     finishBtn && finishBtn.addEventListener('click', () => {
       closeModal($('submitted-modal'));
-      
-      if (currentBooking) {
-        setText('ticket-name', currentBooking.full_name || '—');
-        setText('ticket-package', currentBooking.package);
-        setText('ticket-shirt', currentBooking.shirt_size);
-        setText('ticket-code', 'STR-' + Math.floor(100000 + Math.random() * 900000));
-      }
-      openModal($('receipt-modal'));
+      // Reset the form back to blank so the next person can register
       if (form) form.reset();
+      
+      // Scroll back to the top of the registration section
+      const registerSection = $('register');
+      if (registerSection) {
+          registerSection.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+      }
     });
 
     // --- Modal Closing Mechanics ---
     const confirmModalEl = $('confirm-modal');
     const paymentModalEl = $('payment-modal');
     const submittedModalEl = $('submitted-modal');
-    const receiptModalEl = $('receipt-modal');
   
     const closeConfirm = $('close-confirm');
     closeConfirm && closeConfirm.addEventListener('click', () => closeModal(confirmModalEl));
     const closePayment = $('close-payment');
     closePayment && closePayment.addEventListener('click', () => closeModal(paymentModalEl));
-    const closeReceipt = $('close-receipt');
-    closeReceipt && closeReceipt.addEventListener('click', () => closeModal(receiptModalEl));
   
-    [confirmModalEl, paymentModalEl, submittedModalEl, receiptModalEl].forEach((m) => {
+    [confirmModalEl, paymentModalEl, submittedModalEl].forEach((m) => {
       m && m.addEventListener('click', (e) => { if (e.target === m) closeModal(m); });
     });
   
@@ -316,7 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal(confirmModalEl);
         closeModal(paymentModalEl);
         closeModal(submittedModalEl);
-        closeModal(receiptModalEl);
       }
     });
   
@@ -326,4 +321,45 @@ document.addEventListener('DOMContentLoaded', () => {
       if (Array.isArray(data.detail)) return data.detail.map((d) => d.msg || JSON.stringify(d)).join('; ');
       return '';
     }
+
+    // --- Live Availability / Scarcity Bar ---
+    async function loadAvailability() {
+        const takenEl = $('spots-taken');
+        const capEl = $('spots-capacity');
+        const fill = $('scarcity-fill');
+        
+        try {
+            const data = await fetchJsonWithRetry(`${API_BASE}/api/availability`);
+            
+            const capacity = data.capacity != null ? data.capacity : 2000;
+            const taken = data.taken != null ? data.taken : 0;
+            
+            // Update the text numbers with commas (e.g., 1,500)
+            if (capEl) capEl.textContent = capacity.toLocaleString('en-US');
+            if (takenEl) takenEl.textContent = taken.toLocaleString('en-US');
+            
+            // Update the width of the progress bar
+            if (fill) {
+                const pct = Math.min(100, Math.max(0, (taken / capacity) * 100));
+                if (reduceMotion) fill.style.width = pct + '%';
+                else requestAnimationFrame(() => { fill.style.width = pct + '%'; });
+            }
+            
+            // Disable the form if the race is sold out
+            if (data.sold_out) {
+                const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'RACE SOLD OUT';
+                    submitBtn.style.opacity = '0.5';
+                    submitBtn.style.cursor = 'not-allowed';
+                }
+            }
+        } catch (err) {
+            console.error("Could not load availability:", err);
+        }
+    }
+
+    // Trigger the fetch as soon as the page loads
+    loadAvailability();
 });

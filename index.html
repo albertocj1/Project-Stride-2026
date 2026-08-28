@@ -204,7 +204,7 @@ tailwind.config = {
         <div id="scarcity-fill" class="h-full w-0 bg-stride-ignite rounded-full"></div>
       </div>
     </div>
-    <span class="font-mono text-[11px] tracking-widest text-white/70 shrink-0">1,340 / 2,000 REGISTERED</span>
+    <span class="font-mono text-[11px] tracking-widest text-white/70 shrink-0"><span id="spots-taken">0</span> / <span id="spots-capacity">2,000</span> REGISTERED</span>
   </div>
 </section>
 
@@ -517,7 +517,7 @@ tailwind.config = {
       <div data-reveal class="bg-stride-ink text-stride-chalk border border-stride-ignite/40 rounded-3xl p-7 card-hover flex flex-col justify-between relative">
         <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest bg-stride-ignite text-white px-2 py-1 rounded-full uppercase">Multisport</span>
         <div>
-          <span class="font-mono text-[10px] tracking-widest bg-stride-volt text-stride-ink px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Duathlon</span>
+          <span class="font-mono text-[10px] tracking-widest bg-stride-volt text-stride-ink px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Run &bull; Bike &bull; Run</span>
           <h3 class="font-display text-2xl tracking-wide mb-1 text-stride-chalk">DUATHLON</h3>
           <p class="font-mono text-xs text-stride-volt mb-4">₱2,000 &middot; 5K / 20K / 3K</p>
           <ul class="text-xs text-white/70 space-y-2 font-light mb-8">
@@ -722,30 +722,21 @@ tailwind.config = {
   <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center relative overflow-hidden">
     <div class="w-16 h-16 rounded-full border border-stride-ignite flex items-center justify-center text-2xl text-stride-ignite mx-auto mb-6">✓</div>
     <h3 class="font-display text-3xl tracking-wide mb-2 text-stride-ink">RECEIPT UPLOADED</h3>
-    <p class="text-stride-mute text-xs font-light mb-4 max-w-xs mx-auto">We are verifying your transaction. Your official race kit claiming pass will be emailed once confirmed.</p>
+    
+    <div class="bg-stride-ignite/10 border border-stride-ignite/20 rounded-xl p-4 mb-6">
+      <p class="text-stride-ink text-xs font-medium leading-relaxed">
+        We are verifying your transaction. 
+        <br><br>
+        Once approved by our admin, your official race bib and QR ticket will be sent to your email. <strong class="text-stride-ignite">Please check your inbox (and spam folder) within the next 24 hours.</strong>
+      </p>
+    </div>
+
     <div class="bg-stride-chalk border border-stride-ink/10 rounded-2xl p-4 space-y-2 text-xs font-mono mb-8 text-left">
-      <div class="flex justify-between"><span class="text-stride-mute">RUNNER NAME</span><span id="submitted-name" class="text-stride-ink">—</span></div>
+      <div class="flex justify-between"><span class="text-stride-mute">RUNNER NAME</span><span id="submitted-name" class="text-stride-ink font-bold">—</span></div>
       <div class="flex justify-between"><span class="text-stride-mute">CATEGORY</span><span id="submitted-package" class="text-stride-ink">—</span></div>
       <div class="border-t border-stride-ink/10 pt-2 flex justify-between text-sm font-bold"><span class="text-stride-ignite">TOTAL PAID</span><span id="submitted-total" class="text-stride-ignite">₱0.00</span></div>
     </div>
-    <button id="close-submitted" class="w-full py-4 rounded-full bg-stride-ignite text-white font-mono text-xs font-bold tracking-[0.2em] hover:bg-stride-ink transition-colors duration-300 uppercase">Close</button>
-  </div>
-</div>
-
-<!-- BIB PASS MODAL -->
-<div id="receipt-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-stride-ink/90 backdrop-blur-md hidden">
-  <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center relative overflow-hidden">
-    <div class="w-16 h-16 rounded-full border border-stride-ignite flex items-center justify-center text-2xl text-stride-ignite mx-auto mb-6">✓</div>
-    <h3 class="font-display text-3xl tracking-wide mb-2 text-stride-ink">YOU'RE ON THE START LIST</h3>
-    <p class="text-stride-mute text-xs font-light mb-8 max-w-xs mx-auto">Present this digital pass at bib and kit pickup.</p>
-    <div class="bib-card bg-stride-chalk border-dashed border-2 border-stride-ignite/40 rounded-2xl p-6 space-y-4 text-left font-mono text-xs mb-8">
-      <div class="flex justify-between border-b border-stride-ink/10 pb-3"><span class="text-stride-mute">RUNNER</span><span id="ticket-name" class="text-stride-ink font-bold">—</span></div>
-      <div class="flex justify-between"><span class="text-stride-mute">CATEGORY</span><span id="ticket-package" class="text-stride-ink">—</span></div>
-      <div class="flex justify-between"><span class="text-stride-mute">SHIRT SIZE</span><span id="ticket-shirt" class="text-stride-ink">—</span></div>
-      <div class="flex justify-between"><span class="text-stride-mute">VENUE</span><span class="text-stride-ink">Lima Estate, Malvar</span></div>
-      <div class="flex justify-between border-t border-stride-ink/10 pt-3 text-sm font-bold text-stride-ignite"><span>BIB CODE</span><span id="ticket-code">STR-PENDING</span></div>
-    </div>
-    <button id="close-receipt" class="w-full py-4 rounded-full bg-stride-ignite text-white font-mono text-xs font-bold tracking-[0.2em] hover:bg-stride-ink transition-colors duration-300 uppercase">Close pass</button>
+    <button id="close-submitted" class="w-full py-4 rounded-full bg-stride-ignite text-white font-mono text-xs font-bold tracking-[0.2em] hover:bg-stride-ink transition-colors duration-300 uppercase">Return to Home</button>
   </div>
 </div>
 
@@ -825,10 +816,6 @@ tailwind.config = {
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
   if (toTop) toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
-
-  /* Scarcity bar */
-  const fill = document.getElementById('scarcity-fill');
-  if (fill) requestAnimationFrame(() => { fill.style.width = '67%'; });
 
   /* Mobile menu */
   const menu = document.getElementById('mobile-menu');
