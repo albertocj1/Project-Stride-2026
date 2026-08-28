@@ -214,8 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
       setBusy(confirmBtn, true, 'Submitting\u2026');
       
       try {
-        // Mock POST request to API
-        /*
         const res = await fetch(`${API_BASE}/api/bookings`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -223,12 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(extractError(data) || 'Could not submit your request.');
+        
         currentBooking = data;
-        */
-
-        // Simulated Success for Frontend Build
-        currentBooking = { ...pendingPayload, id: 'BKG-' + Math.floor(Math.random() * 10000) };
-        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network latency
         
         closeModal($('confirm-modal'));
         setText('payment-total-ui', peso(currentBooking.total_amount));
@@ -266,18 +260,12 @@ document.addEventListener('DOMContentLoaded', () => {
       formData.append('receipt', file);
 
       try {
-        // Mock POST request for file upload
-        /*
         const res = await fetch(`${API_BASE}/api/bookings/${currentBooking.id}/submit-payment`, {
           method: 'POST',
           body: formData, 
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(extractError(data) || 'Could not upload receipt.');
-        */
-
-        // Simulated Success
-        await new Promise(resolve => setTimeout(resolve, 1000));
 
         setText('submitted-name', currentBooking.full_name);
         setText('submitted-package', currentBooking.package);

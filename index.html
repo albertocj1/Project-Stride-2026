@@ -19,14 +19,14 @@ tailwind.config = {
       },
       colors: {
         stride: {
-          ink: '#152243',      // Deep Navy Blue (Logo Rope/Flag)
-          chalk: '#FFFFFF',    // Crisp White (Logo Background)
-          cobalt: '#1A3668',   // Medium Flag Blue
-          cobaltDeep: '#0F2043', // Dark Navy Accent
-          ignite: '#C1121F',   // Deep Red (Flag/Crown)
+          ink: '#152243',      
+          chalk: '#FFFFFF',    
+          cobalt: '#1A3668',   
+          cobaltDeep: '#0F2043', 
+          ignite: '#C1121F',   
           igniteDim: 'rgba(193,18,31,0.12)',
-          volt: '#FCD116',     // Sun/Crown Gold
-          mute: '#7A8C99',     // Cool Gray for muted text
+          volt: '#FCD116',     
+          mute: '#7A8C99',     
         }
       }
     }
@@ -92,7 +92,6 @@ tailwind.config = {
 <!-- NAV -->
 <nav id="navbar" class="fixed top-0 left-0 w-full z-50 bg-stride-chalk/90 backdrop-blur-md border-b border-stride-ink/5">
   <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-    <!-- LOGO: Navigation Bar -->
     <a href="#" class="flex items-center">
       <img src="442497274_419117694308411_2751438522990521029_n.jpg" alt="Event Logo" class="h-14 w-auto object-contain rounded-full">
     </a>
@@ -793,6 +792,7 @@ tailwind.config = {
   </div>
 </footer>
 
+<!-- UI Script: Handles layout formatting (Countdown, Accordions, Tabs) -->
 <script>
 (function () {
   'use strict';
@@ -881,132 +881,11 @@ tailwind.config = {
       }
     });
   });
-
-  /* Registration pricing + package select */
-  const packageSel = document.getElementById('package');
-  const estimatedTotal = document.getElementById('estimated-total');
-  const runnerNamesWrap = document.getElementById('runner-names');
-
-  function currentPax() {
-    const opt = packageSel.options[packageSel.selectedIndex];
-    return parseInt(opt.getAttribute('data-pax') || '1', 10);
-  }
-  function currentPrice() {
-    const opt = packageSel.options[packageSel.selectedIndex];
-    return parseInt(opt.getAttribute('data-price') || '0', 10);
-  }
-  function fmtPeso(n) { return '₱' + n.toLocaleString('en-PH'); }
-
-  function renderRunnerNames() {
-    const pax = currentPax();
-    runnerNamesWrap.innerHTML = '';
-    for (let i = 1; i <= pax; i++) {
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.required = true;
-      input.placeholder = pax === 1 ? 'Runner full name' : 'Runner ' + i + ' full name';
-      input.className = 'w-full bg-white/5 border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk font-light text-sm px-4 py-3 outline-none transition-colors duration-300 runner-name-input';
-      runnerNamesWrap.appendChild(input);
-    }
-  }
-
-  function updateTotal() {
-    const total = currentPrice();
-    if (estimatedTotal) estimatedTotal.textContent = fmtPeso(total);
-  }
-
-  function syncPackage() { renderRunnerNames(); updateTotal(); }
-  packageSel && packageSel.addEventListener('change', syncPackage);
-  syncPackage();
-
-  document.querySelectorAll('.select-package-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const pkg = btn.getAttribute('data-package');
-      for (const opt of packageSel.options) {
-        if (opt.value === pkg || opt.value.startsWith(pkg) || pkg.startsWith(opt.value)) { 
-          packageSel.value = opt.value; 
-          break; 
-        }
-      }
-      syncPackage();
-      document.getElementById('register').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
-    });
-  });
-
-  /* Modals flow */
-  const registerForm = document.getElementById('register-form');
-  const confirmModal = document.getElementById('confirm-modal');
-  const paymentModal = document.getElementById('payment-modal');
-  const submittedModal = document.getElementById('submitted-modal');
-  const receiptModal = document.getElementById('receipt-modal');
-
-  function showModal(m) { m.classList.remove('hidden'); document.body.classList.add('modal-active'); }
-  function hideModal(m) { m.classList.add('hidden'); document.body.classList.remove('modal-active'); }
-
-  let lastBooking = null;
-
-  registerForm && registerForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const names = Array.from(document.querySelectorAll('.runner-name-input')).map((i) => i.value.trim()).filter(Boolean);
-    const primaryName = names[0] || document.getElementById('fullname').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const pkgOpt = packageSel.options[packageSel.selectedIndex];
-    const pkgLabel = pkgOpt.value;
-    const shirt = document.getElementById('shirt').value;
-    const referrer = document.getElementById('referrer').value.trim();
-    const total = currentPrice();
-
-    lastBooking = { primaryName, email, pkgLabel, shirt, referrer, total };
-
-    document.getElementById('confirm-name').textContent = primaryName || '—';
-    document.getElementById('confirm-email').textContent = email || '—';
-    document.getElementById('confirm-package').textContent = pkgLabel;
-    document.getElementById('confirm-shirt').textContent = shirt;
-    document.getElementById('confirm-total').textContent = fmtPeso(total);
-    const refRow = document.getElementById('confirm-referrer-row');
-    if (referrer) { refRow.style.display = 'flex'; document.getElementById('confirm-referrer').textContent = referrer; }
-    else { refRow.style.display = 'none'; }
-
-    showModal(confirmModal);
-  });
-
-  document.getElementById('close-confirm') && document.getElementById('close-confirm').addEventListener('click', () => hideModal(confirmModal));
-  document.getElementById('edit-booking') && document.getElementById('edit-booking').addEventListener('click', () => hideModal(confirmModal));
-
-  document.getElementById('confirm-booking') && document.getElementById('confirm-booking').addEventListener('click', () => {
-    hideModal(confirmModal);
-    if (lastBooking) document.getElementById('payment-total-ui').textContent = fmtPeso(lastBooking.total);
-    showModal(paymentModal);
-  });
-  document.getElementById('close-payment') && document.getElementById('close-payment').addEventListener('click', () => hideModal(paymentModal));
-
-  document.getElementById('submit-reference') && document.getElementById('submit-reference').addEventListener('click', () => {
-    hideModal(paymentModal);
-    if (lastBooking) {
-      document.getElementById('submitted-name').textContent = lastBooking.primaryName || '—';
-      document.getElementById('submitted-package').textContent = lastBooking.pkgLabel;
-      document.getElementById('submitted-total').textContent = fmtPeso(lastBooking.total);
-    }
-    showModal(submittedModal);
-  });
-
-  document.getElementById('close-submitted') && document.getElementById('close-submitted').addEventListener('click', () => {
-    hideModal(submittedModal);
-    if (lastBooking) {
-      document.getElementById('ticket-name').textContent = lastBooking.primaryName || '—';
-      document.getElementById('ticket-package').textContent = lastBooking.pkgLabel;
-      document.getElementById('ticket-shirt').textContent = lastBooking.shirt;
-      document.getElementById('ticket-code').textContent = 'STR-' + Math.floor(100000 + Math.random() * 900000);
-    }
-    showModal(receiptModal);
-  });
-  document.getElementById('close-receipt') && document.getElementById('close-receipt').addEventListener('click', () => hideModal(receiptModal));
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { hideModal(confirmModal); hideModal(paymentModal); hideModal(submittedModal); hideModal(receiptModal); closeMenu(); }
-  });
 })();
 </script>
+
+<!-- API & Booking Script -->
+<script src="js/app.js"></script>
+
 </body>
 </html>

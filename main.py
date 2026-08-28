@@ -9,7 +9,6 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from supabase import Client, create_client
 
-# We will assume you update email_module.py to handle the new Stride layout
 from email_module import send_approval_email, send_pending_reminder_email
 
 EVENT_CAPACITY = int(os.getenv("EVENT_CAPACITY", "2000"))  # 2,000 bib cap
@@ -112,6 +111,17 @@ class Booking(BaseModel):
     receipt_url: Optional[str] = None
     bib_code: Optional[str] = None
     created_at: datetime
+
+class BookingUpdate(BaseModel):
+    full_name: Optional[str] = Field(None, min_length=2, max_length=120)
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = Field(None, min_length=7, max_length=20)
+    emergency_contact: Optional[str] = Field(None, min_length=2, max_length=120)
+    package: Optional[str] = None
+    shirt_size: Optional[str] = None
+    guests: Optional[int] = Field(None, ge=1, le=14)
+    guest_names: Optional[list[str]] = None
+    team_name: Optional[str] = None
 
 class CheckinBody(BaseModel):
     kits_claimed: int = Field(..., ge=1, le=50)
@@ -253,6 +263,45 @@ async def submit_payment(booking_id: str, receipt: UploadFile = File(...)):
 def list_bookings():
     return db().table("stride_bookings").select("*").order("created_at", desc=True).limit(1000).execute().data
 
+@app.patch("/api/bookings/{booking_id}", response_model=Booking, dependencies=[Depends(require_admin)])
+def update_booking(booking_id: str, payload: BookingUpdate):
+    existing = _get_booking(booking_id)
+    if existing["status"] == "cancelled":
+        raise HTTPException(status_code=400, detail="Cannot edit a cancelled booking.")
+
+    updates = payload.model_dump(exclude_unset=True)
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update.")
+
+    merged = {**existing, **updates}
+    package = merged.get("package")
+    if package not in PACKAGES:
+        raise HTTPException(status_code=400, detail=f"Unknown package: {package}")
+
+    guests = merged.get("guests")
+    guest_names = merged.get("guest_names") or []
+    if len(guest_names) != guests:
+        raise HTTPException(status_code=400, detail=f"Please provide a name for each guest.")
+
+    cfg = PACKAGES[package]
+    update_payload = {
+        "full_name": merged.get("full_name"),
+        "email": merged.get("email"),
+        "phone": merged.get("phone"),
+        "emergency_contact": merged.get("emergency_contact"),
+        "team_name": merged.get("team_name"),
+        "package": package,
+        "shirt_size": merged.get("shirt_size"),
+        "guests": guests,
+        "guest_names": guest_names,
+        "total_amount": cfg["price"] * guests,
+    }
+
+    res = db().table("stride_bookings").update(update_payload).eq("id", booking_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=502, detail="Failed to update booking.")
+    return Booking(**res.data[0])
+
 @app.post("/api/bookings/{booking_id}/approve", dependencies=[Depends(require_admin)])
 def approve_booking(booking_id: str, background_tasks: BackgroundTasks):
     b = _get_booking(booking_id)
@@ -267,7 +316,6 @@ def approve_booking(booking_id: str, background_tasks: BackgroundTasks):
 
     if res.data:
         booking_data = res.data[0]
-        # Queue the email generation (with the QR code)
         background_tasks.add_task(
             send_approval_email,
             to_email=booking_data["email"],
@@ -284,6 +332,39 @@ def approve_booking(booking_id: str, background_tasks: BackgroundTasks):
 def cancel_booking(booking_id: str):
     res = db().table("stride_bookings").update({"status": "cancelled"}).eq("id", booking_id).execute()
     return Booking(**res.data[0])
+
+@app.post("/api/bookings/remind-pending", dependencies=[Depends(require_admin)])
+def remind_pending_bookings(payload: RemindPayload, background_tasks: BackgroundTasks):
+    query = db().table("stride_bookings").select("*").eq("status", "pending")
+    if payload.booking_ids:
+        query = query.in_("id", payload.booking_ids)
+    res = query.execute()
+    pending_rows = res.data or []
+
+    unique_pending = {}
+    for row in pending_rows:
+        email_key = row["email"].lower().strip()
+        if email_key not in unique_pending:
+            unique_pending[email_key] = row
+
+    reminded_count = 0
+    for email, b in unique_pending.items():
+        background_tasks.add_task(
+            send_pending_reminder_email,
+            to_email=email,
+            guest_name=b["full_name"],
+            package_name=b["package"],
+            guests=b["guests"],
+            total_amount=b["total_amount"],
+        )
+        reminded_count += 1
+
+    return {
+        "status": "success",
+        "reminded_count": reminded_count,
+        "total_pending_rows": len(pending_rows),
+        "duplicates_skipped": len(pending_rows) - reminded_count,
+    }
 
 # --- RECEPTION / KIT PICKUP ENDPOINTS ---
 @app.get("/api/reception/search", dependencies=[Depends(require_reception)])
