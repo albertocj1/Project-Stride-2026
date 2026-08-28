@@ -19,14 +19,14 @@ tailwind.config = {
       },
       colors: {
         stride: {
-          ink: '#14181C',
-          chalk: '#F6F3EC',
-          cobalt: '#0A2F6B',
-          cobaltDeep: '#071F49',
-          ignite: '#FF4612',
-          igniteDim: 'rgba(255,70,18,0.12)',
-          volt: '#D4FF3F',
-          mute: '#7A8088',
+          ink: '#152243',      // Deep Navy Blue (Logo Rope/Flag)
+          chalk: '#FFFFFF',    // Crisp White (Logo Background)
+          cobalt: '#1A3668',   // Medium Flag Blue
+          cobaltDeep: '#0F2043', // Dark Navy Accent
+          ignite: '#C1121F',   // Deep Red (Flag/Crown)
+          igniteDim: 'rgba(193,18,31,0.12)',
+          volt: '#FCD116',     // Sun/Crown Gold
+          mute: '#7A8C99',     // Cool Gray for muted text
         }
       }
     }
@@ -35,17 +35,17 @@ tailwind.config = {
 </script>
 <style>
   html { scroll-behavior: smooth; }
-  body { background: #F6F3EC; }
+  body { background: #FFFFFF; }
 
-  /* Chevron road motif — the signature recurring element */
+  /* Chevron road motif */
   .chevron-strip {
     height: 14px;
-    background-image: repeating-linear-gradient(135deg, #FF4612 0, #FF4612 10px, transparent 10px, transparent 20px);
+    background-image: repeating-linear-gradient(135deg, #C1121F 0, #C1121F 10px, transparent 10px, transparent 20px);
     opacity: 0.9;
   }
-  .chevron-strip.dark { background-image: repeating-linear-gradient(135deg, #D4FF3F 0, #D4FF3F 10px, transparent 10px, transparent 20px); }
+  .chevron-strip.dark { background-image: repeating-linear-gradient(135deg, #FCD116 0, #FCD116 10px, transparent 10px, transparent 20px); }
 
-  #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: #FF4612; z-index: 60; transition: width .1s linear; }
+  #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: #C1121F; z-index: 60; transition: width .1s linear; }
 
   [data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
   [data-reveal].revealed { opacity: 1; transform: translateY(0); }
@@ -64,17 +64,16 @@ tailwind.config = {
 
   #scarcity-fill { transition: width 1.2s cubic-bezier(.16,1,.3,1); }
 
-  .route-tab { border-color: rgba(10,47,107,0.15); color: #0A2F6B; background: #fff; }
-  .route-tab:hover { border-color: #FF4612; color: #FF4612; }
-  .route-tab.active-route { background: #0A2F6B; color: #F6F3EC; border-color: #0A2F6B; }
+  .route-tab { border-color: rgba(26,54,104,0.15); color: #1A3668; background: #fff; }
+  .route-tab:hover { border-color: #C1121F; color: #C1121F; }
+  .route-tab.active-route { background: #1A3668; color: #FFFFFF; border-color: #1A3668; }
 
   .split-digit { font-variant-numeric: tabular-nums; }
 
   .card-hover { transition: transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s ease, border-color .35s ease; }
-  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(10,47,107,0.12); border-color: rgba(255,70,18,0.4); }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(26,54,104,0.12); border-color: rgba(193,18,31,0.4); }
 
-  /* Bib ticket dashed edge */
-  .bib-card { background-image: radial-gradient(circle, #F6F3EC 6px, transparent 6.5px); background-position: -6px 50%, calc(100% + 6px) 50%; background-repeat: no-repeat; }
+  .bib-card { background-image: radial-gradient(circle, #FFFFFF 6px, transparent 6.5px); background-position: -6px 50%, calc(100% + 6px) 50%; background-repeat: no-repeat; }
 
   @keyframes runDash { to { stroke-dashoffset: -200; } }
   .route-path { stroke-dasharray: 10 8; animation: runDash 6s linear infinite; }
@@ -93,8 +92,9 @@ tailwind.config = {
 <!-- NAV -->
 <nav id="navbar" class="fixed top-0 left-0 w-full z-50 bg-stride-chalk/90 backdrop-blur-md border-b border-stride-ink/5">
   <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-    <a href="#" class="font-display text-2xl tracking-wide text-stride-ink">
-      PROJECT <span class="text-stride-ignite">STRIDE</span> <span class="text-stride-cobalt">26</span>
+    <!-- LOGO: Navigation Bar -->
+    <a href="#" class="flex items-center">
+      <img src="442497274_419117694308411_2751438522990521029_n.jpg" alt="Event Logo" class="h-14 w-auto object-contain rounded-full">
     </a>
     <div class="hidden md:flex items-center space-x-9 font-mono text-[11px] tracking-[0.18em] text-stride-mute">
       <a href="#race" class="hover:text-stride-ignite transition-colors">THE RACE</a>
@@ -135,27 +135,30 @@ tailwind.config = {
 <!-- HERO -->
 <header class="relative min-h-[100svh] w-full flex flex-col items-center justify-center overflow-hidden pt-24 pb-14 bg-stride-ink">
   <div class="absolute inset-0 z-0 pointer-events-none">
-    <div class="absolute inset-0 opacity-[0.07]" style="background-image: repeating-linear-gradient(90deg, #F6F3EC 0 2px, transparent 2px 46px);"></div>
+    <div class="absolute inset-0 opacity-[0.07]" style="background-image: repeating-linear-gradient(90deg, #FFFFFF 0 2px, transparent 2px 46px);"></div>
     <div class="absolute inset-0 bg-gradient-to-t from-stride-ink via-stride-ink/60 to-stride-ink"></div>
     <div class="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[140%] h-72 rounded-[100%] bg-stride-ignite/20 blur-3xl"></div>
   </div>
 
   <div class="relative z-20 text-center max-w-5xl px-6 flex flex-col items-center">
-    <span class="font-mono text-xs md:text-sm tracking-[0.35em] text-stride-volt mb-6 uppercase">
-      <!-- EDIT: venue + date placeholder -->
-      [VENUE TBA] &middot; SUNDAY, NOV 15, 2026 &middot; GUN START 5:00 AM
+    
+    <!-- LOGO: Hero Section -->
+    <img src="442497274_419117694308411_2751438522990521029_n.jpg" alt="Event Logo" class="h-32 md:h-48 w-auto mb-8 object-contain rounded-full shadow-2xl">
+
+    <span class="font-mono text-xs md:text-sm tracking-[0.35em] text-stride-volt mb-6 uppercase text-center">
+      LIMA ESTATE, MALVAR, BATANGAS &middot; SATURDAY, NOV 28, 2026 &middot; GUN START 5:00 AM
     </span>
-    <h1 class="font-display text-6xl md:text-8xl lg:text-9xl leading-[0.88] tracking-wide text-stride-chalk mb-2">
+    <h1 class="font-display text-6xl md:text-8xl lg:text-9xl leading-[0.88] tracking-wide text-stride-chalk mb-2 text-center">
       PROJECT<br><span class="text-stride-ignite">STRIDE</span> 2026
     </h1>
     <p class="font-mono text-xs md:text-sm tracking-[0.3em] text-stride-mute uppercase mt-4 mb-8">Fun Run &amp; Duathlon</p>
-    <p class="text-stride-chalk/70 text-sm md:text-base max-w-xl mb-10 leading-relaxed font-light">
-      Four ways to toe the line: 5K, 10K, 21K, or the Run–Bike–Run Duathlon. One start village, one finish chute, one shared morning on the road.
+    <p class="text-stride-chalk/70 text-sm md:text-base max-w-xl mb-10 leading-relaxed font-light text-center">
+      Four ways to toe the line: 3K, 5K, 10K, or the Run–Bike–Run Duathlon (5K–20K–3K). One start village, one finish chute, and complete race inclusions for every athlete.
     </p>
 
     <!-- Split timer / countdown -->
     <div class="mb-10">
-      <span class="font-mono text-[10px] tracking-[0.3em] text-stride-mute uppercase block mb-4">Gun start in</span>
+      <span class="font-mono text-[10px] tracking-[0.3em] text-stride-mute uppercase block mb-4 text-center">Gun start in</span>
       <div id="countdown" class="flex items-start justify-center space-x-3 md:space-x-6 bg-white/5 border border-white/10 rounded-2xl px-6 py-5">
         <div class="flex flex-col items-center">
           <span id="cd-days" class="font-mono split-digit text-3xl md:text-5xl font-bold text-stride-volt">00</span>
@@ -179,7 +182,7 @@ tailwind.config = {
       </div>
     </div>
 
-    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
+    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 justify-center">
       <a href="#register" class="font-mono text-xs tracking-[0.2em] bg-stride-ignite text-white hover:bg-white hover:text-stride-ink px-8 py-4 font-bold rounded-full transition-all duration-300 uppercase">
         Reserve your bib
       </a>
@@ -207,48 +210,47 @@ tailwind.config = {
 </section>
 
 <!-- THE RACE -->
-<section id="race" class="py-28 border-b border-stride-ink/5">
+<section id="race" class="py-28 border-b border-stride-ink/5 bg-stride-chalk">
   <div class="max-w-7xl mx-auto px-6">
     <div class="grid md:grid-cols-2 gap-16 items-center">
       <div data-reveal>
         <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">About the race</span>
-        <h2 class="font-display text-4xl md:text-6xl tracking-wide mb-6 leading-[0.95]">
-          ONE ROAD.<br><span class="text-stride-cobalt">FOUR WAYS</span> TO RUN IT.
+        <h2 class="font-display text-4xl md:text-6xl tracking-wide mb-6 leading-[0.95] text-stride-ink">
+          LIMA ESTATE.<br><span class="text-stride-cobalt">FOUR WAYS</span> TO RACE.
         </h2>
         <div class="w-12 h-[3px] bg-stride-ignite mb-8"></div>
         <p class="text-stride-mute text-base leading-relaxed mb-6 font-light">
-          <strong class="text-stride-ink font-semibold">Project Stride</strong> is built for runners who train for the whole year and want one morning that actually tests it — a certified 21K for the veterans, a 10K for the steady climbers, a 5K for first-timers and families, and a Run–Bike–Run Duathlon for the ones who want a different kind of hurt.
+          <strong class="text-stride-ink font-semibold">Project Stride 2026</strong> takes over the wide, open roads of Lima Estate in Malvar, Batangas. Whether you're running a brisk 3K fun run, pacing a steady 5K or 10K, or taking on the 5KM Run – 20KM Bike – 3KM Run Duathlon challenge, this event delivers a premier race experience.
         </p>
         <p class="text-stride-mute text-base leading-relaxed mb-8 font-light">
-          Every category shares the same start village, the same hydration crew, and the same finish chute — so however far you're going, you cross the same line everyone else does.
+          All packages include a Race Shirt, Race Bib, Finisher’s Medal, and Bottled Water with hydration support throughout the course.
         </p>
-        <div class="grid grid-cols-2 gap-6 text-sm">
-          <div class="flex items-center space-x-3"><span class="text-stride-ignite font-display text-lg">→</span><span class="font-light">4 race categories</span></div>
-          <div class="flex items-center space-x-3"><span class="text-stride-ignite font-display text-lg">→</span><span class="font-light">Chip-timed splits</span></div>
-          <div class="flex items-center space-x-3"><span class="text-stride-ignite font-display text-lg">→</span><span class="font-light">Marshaled &amp; closed to traffic</span></div>
-          <div class="flex items-center space-x-3"><span class="text-stride-ignite font-display text-lg">→</span><span class="font-light">Finisher medal, every distance</span></div>
+        <div class="grid grid-cols-2 gap-6 text-sm text-stride-ink">
+          <div class="flex items-center space-x-3"><span class="text-stride-ignite font-display text-lg">→</span><span class="font-light">3K, 5K, 10K &amp; Duathlon</span></div>
+          <div class="flex items-center space-x-3"><span class="text-stride-ignite font-display text-lg">→</span><span class="font-light">Finisher Medal for all</span></div>
+          <div class="flex items-center space-x-3"><span class="text-stride-ignite font-display text-lg">→</span><span class="font-light">Official Race Shirt &amp; Bib</span></div>
+          <div class="flex items-center space-x-3"><span class="text-stride-ignite font-display text-lg">→</span><span class="font-light">Full Hydration Support</span></div>
         </div>
       </div>
 
-      <!-- Stat block signature element instead of a photo -->
       <div data-reveal class="bg-stride-ink rounded-3xl p-10 md:p-12 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-[0.06]" style="background-image: repeating-linear-gradient(135deg, #F6F3EC 0 2px, transparent 2px 40px);"></div>
+        <div class="absolute inset-0 opacity-[0.06]" style="background-image: repeating-linear-gradient(135deg, #FFFFFF 0 2px, transparent 2px 40px);"></div>
         <div class="relative z-10 grid grid-cols-2 gap-8">
           <div>
-            <span class="font-display text-5xl md:text-6xl text-stride-volt block">5–21</span>
-            <span class="font-mono text-[10px] tracking-[0.25em] text-stride-mute uppercase mt-2 block">KM on offer</span>
+            <span class="font-display text-5xl md:text-6xl text-stride-volt block">3–10</span>
+            <span class="font-mono text-[10px] tracking-[0.25em] text-stride-chalk uppercase mt-2 block opacity-70">KM Run Distances</span>
           </div>
           <div>
-            <span class="font-display text-5xl md:text-6xl text-stride-ignite block">2,000</span>
-            <span class="font-mono text-[10px] tracking-[0.25em] text-stride-mute uppercase mt-2 block">bib cap</span>
+            <span class="font-display text-5xl md:text-6xl text-stride-ignite block">28</span>
+            <span class="font-mono text-[10px] tracking-[0.25em] text-stride-chalk uppercase mt-2 block opacity-70">KM Duathlon Total</span>
           </div>
           <div>
-            <span class="font-display text-5xl md:text-6xl text-stride-chalk block">6</span>
-            <span class="font-mono text-[10px] tracking-[0.25em] text-stride-mute uppercase mt-2 block">hydration stations</span>
+            <span class="font-display text-5xl md:text-6xl text-stride-chalk block">4</span>
+            <span class="font-mono text-[10px] tracking-[0.25em] text-stride-chalk uppercase mt-2 block opacity-70">Key Inclusions</span>
           </div>
           <div>
             <span class="font-display text-5xl md:text-6xl text-stride-chalk block">01</span>
-            <span class="font-mono text-[10px] tracking-[0.25em] text-stride-mute uppercase mt-2 block">shared finish line</span>
+            <span class="font-mono text-[10px] tracking-[0.25em] text-stride-chalk uppercase mt-2 block opacity-70">Shared Finish Line</span>
           </div>
         </div>
       </div>
@@ -258,48 +260,48 @@ tailwind.config = {
 
 <!-- RACE DAY TIMELINE -->
 <section id="timeline" class="py-28 bg-stride-ink text-stride-chalk border-b border-white/5 relative overflow-hidden">
-  <div class="absolute inset-0 opacity-[0.05]" style="background-image: repeating-linear-gradient(90deg, #F6F3EC 0 2px, transparent 2px 60px);"></div>
+  <div class="absolute inset-0 opacity-[0.05]" style="background-image: repeating-linear-gradient(90deg, #FFFFFF 0 2px, transparent 2px 60px);"></div>
   <div class="max-w-7xl mx-auto px-6 relative z-10">
     <div class="text-center max-w-2xl mx-auto mb-20" data-reveal>
-      <span class="font-mono text-[11px] tracking-[0.3em] text-stride-volt uppercase block mb-3">How the morning runs</span>
+      <span class="font-mono text-[11px] tracking-[0.3em] text-stride-volt uppercase block mb-3">Saturday, November 28, 2026</span>
       <h2 class="font-display text-4xl md:text-6xl tracking-wide">RACE DAY TIMELINE</h2>
       <div class="w-16 h-[3px] bg-stride-ignite mx-auto mt-6"></div>
     </div>
     <div class="grid md:grid-cols-5 gap-5">
       <div data-reveal class="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-56 card-hover">
-        <span class="font-mono text-stride-volt text-sm tracking-widest block mb-3">4:00 – 5:00 AM</span>
+        <span class="font-mono text-stride-volt text-sm tracking-widest block mb-3">4:00 – 4:45 AM</span>
         <h3 class="font-display text-lg tracking-wide mb-2">BIB &amp; KIT PICKUP</h3>
-        <p class="text-white/60 text-xs font-light leading-relaxed">Start village check-in — bring your confirmation and a valid ID.</p>
-      </div>
-      <div data-reveal class="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-56 card-hover">
-        <span class="font-mono text-stride-volt text-sm tracking-widest block mb-3">5:00 AM</span>
-        <h3 class="font-display text-lg tracking-wide mb-2">21K GUN START</h3>
-        <p class="text-white/60 text-xs font-light leading-relaxed">Half marathon field rolls out first — longest course, earliest gun.</p>
+        <p class="text-white/60 text-xs font-light leading-relaxed">Lima Estate race village check-in — claim your shirt, bib, and water.</p>
       </div>
       <div data-reveal class="bg-stride-ignite/15 border border-stride-ignite/50 rounded-2xl p-6 flex flex-col justify-between h-56 card-hover">
-        <span class="font-mono text-stride-ignite text-sm tracking-widest block mb-3">5:15 AM</span>
+        <span class="font-mono text-stride-ignite text-sm tracking-widest block mb-3">5:00 AM</span>
         <h3 class="font-display text-lg tracking-wide mb-2 text-stride-ignite">DUATHLON START</h3>
-        <p class="text-white/70 text-xs font-light leading-relaxed">Run leg begins, transition zone waits at Stride Village.</p>
+        <p class="text-white/70 text-xs font-light leading-relaxed">5KM Run &rarr; 20KM Bike &rarr; 3KM Run kicks off the morning.</p>
+      </div>
+      <div data-reveal class="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-56 card-hover">
+        <span class="font-mono text-stride-volt text-sm tracking-widest block mb-3">5:30 AM</span>
+        <h3 class="font-display text-lg tracking-wide mb-2">10K GUN START</h3>
+        <p class="text-white/60 text-xs font-light leading-relaxed">Scenic open course through Lima Estate.</p>
       </div>
       <div data-reveal class="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-56 card-hover">
         <span class="font-mono text-stride-volt text-sm tracking-widest block mb-3">5:45 AM</span>
-        <h3 class="font-display text-lg tracking-wide mb-2">10K GUN START</h3>
-        <p class="text-white/60 text-xs font-light leading-relaxed">Rolling out-and-back with timed splits every 2K.</p>
+        <h3 class="font-display text-lg tracking-wide mb-2">5K GUN START</h3>
+        <p class="text-white/60 text-xs font-light leading-relaxed">Fast and steady mid-distance loop.</p>
       </div>
       <div data-reveal class="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-56 card-hover">
         <span class="font-mono text-stride-volt text-sm tracking-widest block mb-3">6:00 AM</span>
-        <h3 class="font-display text-lg tracking-wide mb-2">5K GUN START</h3>
-        <p class="text-white/60 text-xs font-light leading-relaxed">Flat park loop — built for first-timers and families.</p>
+        <h3 class="font-display text-lg tracking-wide mb-2">3K GUN START</h3>
+        <p class="text-white/60 text-xs font-light leading-relaxed">Fun run loop tailored for beginners, kids, and families.</p>
       </div>
     </div>
     <div data-reveal class="mt-6 bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       <div>
-        <span class="font-mono text-stride-volt text-sm tracking-widest block mb-1">6:00 – 9:30 AM</span>
+        <span class="font-mono text-stride-volt text-sm tracking-widest block mb-1">6:00 – 9:00 AM</span>
         <h3 class="font-display text-lg tracking-wide">RACE VILLAGE OPEN</h3>
       </div>
-      <p class="text-white/60 text-xs font-light md:max-w-md">Hydration, medical tent, and finisher photo booth stay open until awarding.</p>
+      <p class="text-white/60 text-xs font-light md:max-w-md">Medal claiming, photo ops, and hydration tents open throughout the morning.</p>
       <div class="text-right">
-        <span class="font-mono text-stride-volt text-sm tracking-widest block mb-1">9:30 AM</span>
+        <span class="font-mono text-stride-volt text-sm tracking-widest block mb-1">9:00 AM</span>
         <h3 class="font-display text-lg tracking-wide">AWARDING CEREMONY</h3>
       </div>
     </div>
@@ -307,40 +309,72 @@ tailwind.config = {
 </section>
 
 <!-- CATEGORIES -->
-<section id="categories" class="py-28 border-b border-stride-ink/5">
+<section id="categories" class="py-28 border-b border-stride-ink/5 bg-stride-chalk">
   <div class="max-w-7xl mx-auto px-6">
     <div class="text-center max-w-2xl mx-auto mb-20" data-reveal>
-      <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">Pick your distance</span>
-      <h2 class="font-display text-4xl md:text-6xl tracking-wide">RACE CATEGORIES</h2>
+      <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">Pick your challenge</span>
+      <h2 class="font-display text-4xl md:text-6xl tracking-wide text-stride-ink">RACE CATEGORIES</h2>
       <div class="w-16 h-[3px] bg-stride-ignite mx-auto mt-6"></div>
     </div>
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div data-reveal class="bg-white border border-stride-ink/10 rounded-2xl p-7 card-hover">
-        <span class="font-mono text-[10px] tracking-widest text-stride-cobalt uppercase border border-stride-cobalt/30 rounded-full px-3 py-1 inline-block mb-5">Beginner friendly</span>
-        <h3 class="font-display text-4xl tracking-wide mb-1">5K</h3>
-        <p class="font-mono text-xs text-stride-ignite mb-4">Gun 6:00 AM &middot; Cutoff 1.5 hrs</p>
-        <p class="text-stride-mute text-xs font-light leading-relaxed">Flat park loop, closed to traffic. Built for first-timers, families, and anyone chasing a PR on an easy course.</p>
+      
+      <div data-reveal class="bg-white border border-stride-ink/10 rounded-2xl p-7 card-hover flex flex-col justify-between">
+        <div>
+          <span class="font-mono text-[10px] tracking-widest text-stride-cobalt uppercase border border-stride-cobalt/30 rounded-full px-3 py-1 inline-block mb-5">Fun Run</span>
+          <h3 class="font-display text-4xl tracking-wide mb-1 text-stride-ink">3K</h3>
+          <p class="font-mono text-xs text-stride-ignite mb-4">₱500 &middot; Gun 6:00 AM</p>
+          <p class="text-stride-mute text-xs font-light leading-relaxed mb-6">Perfect for beginners, kids, and casual runners wanting to experience race day excitement.</p>
+        </div>
+        <ul class="text-[11px] text-stride-mute space-y-1.5 font-mono pt-4 border-t border-stride-ink/10">
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Race Shirt &amp; Bib</li>
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Finisher’s Medal</li>
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Bottled Water</li>
+        </ul>
       </div>
-      <div data-reveal class="bg-white border border-stride-ink/10 rounded-2xl p-7 card-hover">
-        <span class="font-mono text-[10px] tracking-widest text-stride-cobalt uppercase border border-stride-cobalt/30 rounded-full px-3 py-1 inline-block mb-5">Steady climb</span>
-        <h3 class="font-display text-4xl tracking-wide mb-1">10K</h3>
-        <p class="font-mono text-xs text-stride-ignite mb-4">Gun 5:45 AM &middot; Cutoff 2 hrs</p>
-        <p class="text-stride-mute text-xs font-light leading-relaxed">Rolling out-and-back with a few honest hills. Timed splits every 2K keep you honest too.</p>
+
+      <div data-reveal class="bg-white border border-stride-ink/10 rounded-2xl p-7 card-hover flex flex-col justify-between">
+        <div>
+          <span class="font-mono text-[10px] tracking-widest text-stride-cobalt uppercase border border-stride-cobalt/30 rounded-full px-3 py-1 inline-block mb-5">Standard</span>
+          <h3 class="font-display text-4xl tracking-wide mb-1 text-stride-ink">5K</h3>
+          <p class="font-mono text-xs text-stride-ignite mb-4">₱750 &middot; Gun 5:45 AM</p>
+          <p class="text-stride-mute text-xs font-light leading-relaxed mb-6">A fast, smooth road course through the Lima Estate loop built to hit your season PR.</p>
+        </div>
+        <ul class="text-[11px] text-stride-mute space-y-1.5 font-mono pt-4 border-t border-stride-ink/10">
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Race Shirt &amp; Bib</li>
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Finisher’s Medal</li>
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Bottled Water</li>
+        </ul>
       </div>
-      <div data-reveal class="bg-stride-ink text-stride-chalk border border-stride-ink rounded-2xl p-7 card-hover relative">
-        <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest border border-stride-volt text-stride-volt px-2 py-1 rounded-full uppercase">Flagship</span>
-        <span class="font-mono text-[10px] tracking-widest text-stride-volt uppercase border border-stride-volt/30 rounded-full px-3 py-1 inline-block mb-5">Certified distance</span>
-        <h3 class="font-display text-4xl tracking-wide mb-1">21K</h3>
-        <p class="font-mono text-xs text-stride-volt mb-4">Gun 5:00 AM &middot; Cutoff 3.5 hrs</p>
-        <p class="text-white/60 text-xs font-light leading-relaxed">The full half marathon route — the earliest gun and the longest morning on the road.</p>
+
+      <div data-reveal class="bg-white border border-stride-ink/10 rounded-2xl p-7 card-hover flex flex-col justify-between">
+        <div>
+          <span class="font-mono text-[10px] tracking-widest text-stride-cobalt uppercase border border-stride-cobalt/30 rounded-full px-3 py-1 inline-block mb-5">Endurance</span>
+          <h3 class="font-display text-4xl tracking-wide mb-1 text-stride-ink">10K</h3>
+          <p class="font-mono text-xs text-stride-ignite mb-4">₱1,000 &middot; Gun 5:30 AM</p>
+          <p class="text-stride-mute text-xs font-light leading-relaxed mb-6">Double the distance for dedicated runners ready to test their stamina on wide, open avenues.</p>
+        </div>
+        <ul class="text-[11px] text-stride-mute space-y-1.5 font-mono pt-4 border-t border-stride-ink/10">
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Race Shirt &amp; Bib</li>
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Finisher’s Medal</li>
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Bottled Water</li>
+        </ul>
       </div>
-      <div data-reveal class="bg-white border border-stride-ignite/40 rounded-2xl p-7 card-hover relative">
-        <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest bg-stride-ignite text-white px-2 py-1 rounded-full uppercase">Two disciplines</span>
-        <span class="font-mono text-[10px] tracking-widest text-stride-ignite uppercase border border-stride-ignite/30 rounded-full px-3 py-1 inline-block mb-5">Run · Bike · Run</span>
-        <h3 class="font-display text-3xl tracking-wide mb-1">DUATHLON</h3>
-        <p class="font-mono text-xs text-stride-ignite mb-4">Gun 5:15 AM &middot; Cutoff 3 hrs</p>
-        <p class="text-stride-mute text-xs font-light leading-relaxed">5K run &rarr; 20K bike &rarr; 2.5K run, with one transition at Stride Village. Helmet mandatory.</p>
+
+      <div data-reveal class="bg-stride-ink text-stride-chalk border border-stride-ignite/40 rounded-2xl p-7 card-hover relative flex flex-col justify-between">
+        <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest bg-stride-ignite text-white px-2 py-1 rounded-full uppercase">Multisport</span>
+        <div>
+          <span class="font-mono text-[10px] tracking-widest bg-stride-volt text-stride-ink px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Run &bull; Bike &bull; Run</span>
+          <h3 class="font-display text-3xl tracking-wide mb-1">DUATHLON</h3>
+          <p class="font-mono text-xs text-stride-volt mb-4">₱2,000 &middot; Gun 5:00 AM</p>
+          <p class="text-white/60 text-xs font-light leading-relaxed mb-6">5KM Run &rarr; 20KM Bike &rarr; 3KM Run with reserved transition racks at Stride Village.</p>
+        </div>
+        <ul class="text-[11px] text-white/70 space-y-1.5 font-mono pt-4 border-t border-white/10">
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Race Shirt &amp; Bib</li>
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Finisher’s Medal</li>
+          <li class="flex items-center gap-2"><span class="text-stride-ignite">✓</span> Bottled Water</li>
+        </ul>
       </div>
+
     </div>
   </div>
 </section>
@@ -349,171 +383,152 @@ tailwind.config = {
 <section id="course" class="py-28 bg-white border-b border-stride-ink/5">
   <div class="max-w-7xl mx-auto px-6">
     <div class="text-center max-w-2xl mx-auto mb-14" data-reveal>
-      <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">Know the road</span>
-      <h2 class="font-display text-4xl md:text-6xl tracking-wide">COURSE MAP</h2>
+      <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">Lima Estate, Malvar</span>
+      <h2 class="font-display text-4xl md:text-6xl tracking-wide text-stride-ink">COURSE MAP</h2>
       <div class="w-16 h-[3px] bg-stride-ignite mx-auto mt-6"></div>
-      <p class="text-stride-mute text-sm font-light leading-relaxed mt-6">Every route starts and ends at Stride Village. Flip through each category to see the loop, the climbs, and where the water stations sit.</p>
+      <p class="text-stride-mute text-sm font-light leading-relaxed mt-6">All routes start and finish at Lima Estate Stride Village with designated water stations along every kilometer.</p>
     </div>
 
     <div class="flex flex-wrap justify-center gap-3 mb-10" data-reveal>
-      <button class="route-tab active-route font-mono text-[11px] tracking-[0.18em] uppercase px-6 py-3 rounded-full border transition-all duration-300" data-route="5k">5K Route</button>
+      <button class="route-tab active-route font-mono text-[11px] tracking-[0.18em] uppercase px-6 py-3 rounded-full border transition-all duration-300" data-route="3k">3K Route</button>
+      <button class="route-tab font-mono text-[11px] tracking-[0.18em] uppercase px-6 py-3 rounded-full border transition-all duration-300" data-route="5k">5K Route</button>
       <button class="route-tab font-mono text-[11px] tracking-[0.18em] uppercase px-6 py-3 rounded-full border transition-all duration-300" data-route="10k">10K Route</button>
-      <button class="route-tab font-mono text-[11px] tracking-[0.18em] uppercase px-6 py-3 rounded-full border transition-all duration-300" data-route="21k">21K Route</button>
       <button class="route-tab font-mono text-[11px] tracking-[0.18em] uppercase px-6 py-3 rounded-full border transition-all duration-300" data-route="du">Duathlon Route</button>
     </div>
 
     <div data-reveal class="bg-stride-ink rounded-3xl p-6 md:p-10 relative overflow-hidden">
-      <div class="route-panel" data-route="5k">
+      <div class="route-panel" data-route="3k">
         <svg viewBox="0 0 800 320" class="w-full h-auto">
-          <path d="M 80 250 Q 200 100 400 160 T 720 90" fill="none" stroke="#2A2E33" stroke-width="10" stroke-linecap="round"/>
-          <path class="route-path" d="M 80 250 Q 200 100 400 160 T 720 90" fill="none" stroke="#D4FF3F" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="80" cy="250" r="9" fill="#FF4612"/>
-          <circle cx="720" cy="90" r="9" fill="#D4FF3F"/>
-          <text x="60" y="280" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">START/FINISH</text>
-          <text x="640" y="70" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">TURN POINT</text>
+          <path d="M 100 240 Q 250 140 400 190 T 700 130" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
+          <path class="route-path" d="M 100 240 Q 250 140 400 190 T 700 130" fill="none" stroke="#FCD116" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="100" cy="240" r="9" fill="#C1121F"/>
+          <circle cx="700" cy="130" r="9" fill="#FCD116"/>
+          <text x="80" y="275" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">START/FINISH</text>
+          <text x="630" y="110" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">1.5K TURN</text>
+        </svg>
+      </div>
+      <div class="route-panel hidden" data-route="5k">
+        <svg viewBox="0 0 800 320" class="w-full h-auto">
+          <path d="M 80 250 Q 200 100 400 160 T 720 90" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
+          <path class="route-path" d="M 80 250 Q 200 100 400 160 T 720 90" fill="none" stroke="#FCD116" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="80" cy="250" r="9" fill="#C1121F"/>
+          <circle cx="720" cy="90" r="9" fill="#FCD116"/>
+          <text x="60" y="280" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">START/FINISH</text>
+          <text x="640" y="70" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">2.5K TURN</text>
         </svg>
       </div>
       <div class="route-panel hidden" data-route="10k">
         <svg viewBox="0 0 800 320" class="w-full h-auto">
-          <path d="M 80 260 Q 180 60 380 140 Q 560 200 720 60" fill="none" stroke="#2A2E33" stroke-width="10" stroke-linecap="round"/>
-          <path class="route-path" d="M 80 260 Q 180 60 380 140 Q 560 200 720 60" fill="none" stroke="#D4FF3F" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="80" cy="260" r="9" fill="#FF4612"/>
-          <circle cx="380" cy="140" r="6" fill="#F6F3EC"/>
-          <circle cx="720" cy="60" r="9" fill="#D4FF3F"/>
-          <text x="60" y="290" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">START/FINISH</text>
-          <text x="330" y="125" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">5K SPLIT</text>
-          <text x="640" y="45" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">TURN POINT</text>
-        </svg>
-      </div>
-      <div class="route-panel hidden" data-route="21k">
-        <svg viewBox="0 0 800 320" class="w-full h-auto">
-          <path d="M 80 270 Q 120 60 320 90 Q 520 120 560 260 Q 600 300 720 150" fill="none" stroke="#2A2E33" stroke-width="10" stroke-linecap="round"/>
-          <path class="route-path" d="M 80 270 Q 120 60 320 90 Q 520 120 560 260 Q 600 300 720 150" fill="none" stroke="#D4FF3F" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="80" cy="270" r="9" fill="#FF4612"/>
-          <circle cx="320" cy="90" r="6" fill="#F6F3EC"/>
-          <circle cx="560" cy="260" r="6" fill="#F6F3EC"/>
-          <circle cx="720" cy="150" r="9" fill="#D4FF3F"/>
-          <text x="60" y="300" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">START/FINISH</text>
-          <text x="280" y="75" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">10K SPLIT</text>
-          <text x="510" y="245" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">18K SPLIT</text>
+          <path d="M 80 260 Q 180 60 380 140 Q 560 200 720 60" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
+          <path class="route-path" d="M 80 260 Q 180 60 380 140 Q 560 200 720 60" fill="none" stroke="#FCD116" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="80" cy="260" r="9" fill="#C1121F"/>
+          <circle cx="380" cy="140" r="6" fill="#FFFFFF"/>
+          <circle cx="720" cy="60" r="9" fill="#FCD116"/>
+          <text x="60" y="290" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">START/FINISH</text>
+          <text x="330" y="125" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">5K SPLIT</text>
+          <text x="640" y="45" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">5K TURN POINT</text>
         </svg>
       </div>
       <div class="route-panel hidden" data-route="du">
         <svg viewBox="0 0 800 320" class="w-full h-auto">
-          <path d="M 80 200 Q 180 90 300 200" fill="none" stroke="#2A2E33" stroke-width="10" stroke-linecap="round"/>
-          <path class="route-path" d="M 80 200 Q 180 90 300 200" fill="none" stroke="#FF4612" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="300" cy="200" r="10" fill="#F6F3EC"/>
-          <path d="M 300 200 Q 480 40 680 200" fill="none" stroke="#2A2E33" stroke-width="10" stroke-linecap="round"/>
-          <path class="route-path" d="M 300 200 Q 480 40 680 200" fill="none" stroke="#D4FF3F" stroke-width="3" stroke-linecap="round"/>
-          <path d="M 680 200 Q 500 300 300 210" fill="none" stroke="#2A2E33" stroke-width="10" stroke-linecap="round"/>
-          <path class="route-path" d="M 680 200 Q 500 300 300 210" fill="none" stroke="#FF4612" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="80" cy="200" r="9" fill="#FF4612"/>
-          <text x="60" y="230" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">START</text>
-          <text x="255" y="230" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">T1 · BIKE</text>
-          <text x="640" y="230" fill="#F6F3EC" font-family="IBM Plex Mono" font-size="12">T2 · RUN</text>
+          <path d="M 80 200 Q 180 90 300 200" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
+          <path class="route-path" d="M 80 200 Q 180 90 300 200" fill="none" stroke="#C1121F" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="300" cy="200" r="10" fill="#FFFFFF"/>
+          <path d="M 300 200 Q 480 40 680 200" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
+          <path class="route-path" d="M 300 200 Q 480 40 680 200" fill="none" stroke="#FCD116" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 680 200 Q 500 300 300 210" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/>
+          <path class="route-path" d="M 680 200 Q 500 300 300 210" fill="none" stroke="#C1121F" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="80" cy="200" r="9" fill="#C1121F"/>
+          <text x="50" y="230" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">RUN 1 (5K)</text>
+          <text x="240" y="230" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">T1 · BIKE (20K)</text>
+          <text x="630" y="230" fill="#FFFFFF" font-family="IBM Plex Mono" font-size="12">T2 · RUN 2 (3K)</text>
         </svg>
       </div>
     </div>
 
     <div class="text-center mt-8" data-reveal>
       <p id="route-caption" class="text-stride-mute text-sm font-light leading-relaxed max-w-xl mx-auto">
-        <span class="text-stride-ignite font-mono text-[11px] tracking-widest uppercase block mb-2">5K Route</span>
-        One flat loop through the park, closed to traffic the whole way. No turns sharper than a jog.
+        <span class="text-stride-ignite font-mono text-[11px] tracking-widest uppercase block mb-2">3K Route</span>
+        A smooth, scenic loop around Lima Estate closed to vehicular traffic.
       </p>
     </div>
   </div>
 </section>
 
 <!-- REGISTRATION TIERS -->
-<section id="register-tiers" class="py-28">
+<section id="register-tiers" class="py-28 bg-stride-chalk">
   <div class="max-w-7xl mx-auto px-6">
     <div class="text-center max-w-2xl mx-auto mb-20" data-reveal>
       <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">Lock your slot</span>
-      <h2 class="font-display text-4xl md:text-6xl tracking-wide">REGISTRATION</h2>
+      <h2 class="font-display text-4xl md:text-6xl tracking-wide text-stride-ink">PACKAGES &amp; PRICING</h2>
       <div class="w-16 h-[3px] bg-stride-ignite mx-auto mt-6"></div>
+      <p class="text-stride-mute text-xs tracking-wider uppercase mt-4">All packages include: Race Shirt &bull; Race Bib &bull; Finisher’s Medal &bull; Bottled Water</p>
     </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
+      <!-- 3K -->
       <div data-reveal class="bg-white border border-stride-ink/10 rounded-3xl p-7 card-hover flex flex-col justify-between">
         <div>
-          <span class="font-mono text-[10px] tracking-widest bg-stride-cobalt text-white px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Solo</span>
-          <h3 class="font-display text-2xl tracking-wide mb-1">5K INDIVIDUAL</h3>
+          <span class="font-mono text-[10px] tracking-widest bg-stride-cobalt text-white px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Fun Run</span>
+          <h3 class="font-display text-2xl tracking-wide mb-1 text-stride-ink">3KM RUN</h3>
+          <p class="font-mono text-xs text-stride-ignite mb-4">₱500 / runner</p>
+          <ul class="text-xs text-stride-mute space-y-2 font-light mb-8">
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Official Race Shirt</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Personalized Race Bib</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Finisher’s Medal</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Bottled Water &amp; Hydration</span></li>
+          </ul>
+        </div>
+        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full border border-stride-ignite/40 hover:bg-stride-ignite hover:text-white font-mono text-xs font-bold tracking-widest text-stride-ignite transition-all duration-300 uppercase" data-package="3KM Individual" data-price="500" data-pax="1">Select 3K</a>
+      </div>
+
+      <!-- 5K -->
+      <div data-reveal class="bg-white border border-stride-ink/10 rounded-3xl p-7 card-hover flex flex-col justify-between">
+        <div>
+          <span class="font-mono text-[10px] tracking-widest bg-stride-cobalt text-white px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Individual</span>
+          <h3 class="font-display text-2xl tracking-wide mb-1 text-stride-ink">5KM RUN</h3>
           <p class="font-mono text-xs text-stride-ignite mb-4">₱750 / runner</p>
           <ul class="text-xs text-stride-mute space-y-2 font-light mb-8">
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>Timing chip &amp; finisher medal</span></li>
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>Race singlet, size guaranteed before cutoff</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Official Race Shirt</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Personalized Race Bib</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Finisher’s Medal</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Bottled Water &amp; Hydration</span></li>
           </ul>
         </div>
-        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full border border-stride-ignite/40 hover:bg-stride-ignite hover:text-white font-mono text-xs font-bold tracking-widest text-stride-ignite transition-all duration-300 uppercase" data-package="5K Individual" data-price="750" data-pax="1">Select</a>
+        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full border border-stride-ignite/40 hover:bg-stride-ignite hover:text-white font-mono text-xs font-bold tracking-widest text-stride-ignite transition-all duration-300 uppercase" data-package="5KM Individual" data-price="750" data-pax="1">Select 5K</a>
       </div>
 
+      <!-- 10K -->
       <div data-reveal class="bg-white border border-stride-ink/10 rounded-3xl p-7 card-hover flex flex-col justify-between">
         <div>
-          <span class="font-mono text-[10px] tracking-widest bg-stride-cobalt text-white px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Solo</span>
-          <h3 class="font-display text-2xl tracking-wide mb-1">10K INDIVIDUAL</h3>
-          <p class="font-mono text-xs text-stride-ignite mb-4">₱950 / runner</p>
+          <span class="font-mono text-[10px] tracking-widest bg-stride-cobalt text-white px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Individual</span>
+          <h3 class="font-display text-2xl tracking-wide mb-1 text-stride-ink">10KM RUN</h3>
+          <p class="font-mono text-xs text-stride-ignite mb-4">₱1,000 / runner</p>
           <ul class="text-xs text-stride-mute space-y-2 font-light mb-8">
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>Timing chip &amp; finisher medal</span></li>
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>Race singlet + post-race meal</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Official Race Shirt</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Personalized Race Bib</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Finisher’s Medal</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-ignite">✓</span><span>Bottled Water &amp; Hydration</span></li>
           </ul>
         </div>
-        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full border border-stride-ignite/40 hover:bg-stride-ignite hover:text-white font-mono text-xs font-bold tracking-widest text-stride-ignite transition-all duration-300 uppercase" data-package="10K Individual" data-price="950" data-pax="1">Select</a>
+        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full border border-stride-ignite/40 hover:bg-stride-ignite hover:text-white font-mono text-xs font-bold tracking-widest text-stride-ignite transition-all duration-300 uppercase" data-package="10KM Individual" data-price="1000" data-pax="1">Select 10K</a>
       </div>
 
-      <div data-reveal class="bg-stride-ink text-stride-chalk border border-stride-volt/40 rounded-3xl p-7 card-hover flex flex-col justify-between relative">
-        <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest border border-stride-volt text-stride-volt px-2 py-1 rounded-full uppercase">Flagship</span>
+      <!-- Duathlon -->
+      <div data-reveal class="bg-stride-ink text-stride-chalk border border-stride-ignite/40 rounded-3xl p-7 card-hover flex flex-col justify-between relative">
+        <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest bg-stride-ignite text-white px-2 py-1 rounded-full uppercase">Multisport</span>
         <div>
-          <span class="font-mono text-[10px] tracking-widest bg-stride-volt text-stride-ink px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Solo</span>
-          <h3 class="font-display text-2xl tracking-wide mb-1">21K INDIVIDUAL</h3>
-          <p class="font-mono text-xs text-stride-volt mb-4">₱1,450 / runner</p>
-          <ul class="text-xs text-white/60 space-y-2 font-light mb-8">
-            <li class="flex items-center space-x-2"><span class="text-stride-volt">◦</span><span>Certified half-marathon finish</span></li>
-            <li class="flex items-center space-x-2"><span class="text-stride-volt">◦</span><span>Finisher medal, singlet &amp; recovery kit</span></li>
+          <span class="font-mono text-[10px] tracking-widest bg-stride-volt text-stride-ink px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Duathlon</span>
+          <h3 class="font-display text-2xl tracking-wide mb-1 text-stride-chalk">DUATHLON</h3>
+          <p class="font-mono text-xs text-stride-volt mb-4">₱2,000 &middot; 5K / 20K / 3K</p>
+          <ul class="text-xs text-white/70 space-y-2 font-light mb-8">
+            <li class="flex items-center space-x-2"><span class="text-stride-volt">✓</span><span>Official Race Shirt</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-volt">✓</span><span>Personalized Race Bib</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-volt">✓</span><span>Duathlon Finisher’s Medal</span></li>
+            <li class="flex items-center space-x-2"><span class="text-stride-volt">✓</span><span>Bottled Water &amp; Transition Rack</span></li>
           </ul>
         </div>
-        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full bg-stride-volt text-stride-ink font-mono text-xs font-bold tracking-widest hover:bg-white transition-colors duration-300 uppercase" data-package="21K Individual" data-price="1450" data-pax="1">Select</a>
-      </div>
-
-      <div data-reveal class="bg-white border border-stride-ignite/40 rounded-3xl p-7 card-hover flex flex-col justify-between relative">
-        <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest bg-stride-ignite text-white px-2 py-1 rounded-full uppercase">Two disciplines</span>
-        <div>
-          <span class="font-mono text-[10px] tracking-widest bg-stride-ignite text-white px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Solo</span>
-          <h3 class="font-display text-2xl tracking-wide mb-1">DUATHLON SOLO</h3>
-          <p class="font-mono text-xs text-stride-ignite mb-4">₱1,800 / athlete</p>
-          <ul class="text-xs text-stride-mute space-y-2 font-light mb-8">
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>5K run · 20K bike · 2.5K run</span></li>
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>Transition rack space reserved</span></li>
-          </ul>
-        </div>
-        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full border border-stride-ignite/40 hover:bg-stride-ignite hover:text-white font-mono text-xs font-bold tracking-widest text-stride-ignite transition-all duration-300 uppercase" data-package="Duathlon Solo" data-price="1800" data-pax="1">Select</a>
-      </div>
-
-      <div data-reveal class="bg-white border border-stride-ink/10 rounded-3xl p-7 card-hover flex flex-col justify-between relative">
-        <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest bg-stride-cobalt text-white px-2 py-1 rounded-full uppercase">Team of 2</span>
-        <div>
-          <span class="font-mono text-[10px] tracking-widest bg-stride-cobalt text-white px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Relay</span>
-          <h3 class="font-display text-2xl tracking-wide mb-1">DUATHLON RELAY</h3>
-          <p class="font-mono text-xs text-stride-ignite mb-4">₱2,800 / team &middot; 2 athletes</p>
-          <ul class="text-xs text-stride-mute space-y-2 font-light mb-8">
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>Split the run and bike legs</span></li>
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>Shared team bib &amp; finish</span></li>
-          </ul>
-        </div>
-        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full border border-stride-ignite/40 hover:bg-stride-ignite hover:text-white font-mono text-xs font-bold tracking-widest text-stride-ignite transition-all duration-300 uppercase" data-package="Duathlon Relay" data-price="2800" data-pax="2">Select</a>
-      </div>
-
-      <div data-reveal class="bg-white border border-stride-ink/10 rounded-3xl p-7 card-hover flex flex-col justify-between relative">
-        <span class="absolute top-5 right-5 font-mono text-[9px] tracking-widest bg-stride-cobalt text-white px-2 py-1 rounded-full uppercase">Team of 5</span>
-        <div>
-          <span class="font-mono text-[10px] tracking-widest bg-stride-cobalt text-white px-3 py-1 rounded-full font-bold uppercase inline-block mb-5">Squad</span>
-          <h3 class="font-display text-2xl tracking-wide mb-1">SQUAD 5K</h3>
-          <p class="font-mono text-xs text-stride-ignite mb-4">₱3,000 / squad &middot; 5 runners</p>
-          <ul class="text-xs text-stride-mute space-y-2 font-light mb-8">
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>5K entry for the whole crew</span></li>
-            <li class="flex items-center space-x-2"><span class="text-stride-ignite">◦</span><span>Matching bib numbers on request</span></li>
-          </ul>
-        </div>
-        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full border border-stride-ignite/40 hover:bg-stride-ignite hover:text-white font-mono text-xs font-bold tracking-widest text-stride-ignite transition-all duration-300 uppercase" data-package="Squad 5K" data-price="3000" data-pax="5">Select</a>
+        <a href="#register" class="select-package-btn w-full block text-center py-3 rounded-full bg-stride-ignite text-white font-mono text-xs font-bold tracking-widest hover:bg-stride-volt hover:text-stride-ink transition-colors duration-300 uppercase" data-package="Duathlon (5K-20K-3K)" data-price="2000" data-pax="1">Select Duathlon</a>
       </div>
 
     </div>
@@ -556,18 +571,16 @@ tailwind.config = {
             <label for="package" class="block font-mono text-[11px] tracking-wider text-white/50 mb-2 uppercase">Category / Package</label>
             <div class="relative">
               <select id="package" class="w-full bg-white/5 border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk font-light text-sm px-4 py-3 outline-none appearance-none cursor-pointer transition-colors duration-300">
-                <option value="5K Individual" data-price="750" data-pax="1">5K Individual — ₱750</option>
-                <option value="10K Individual" data-price="950" data-pax="1">10K Individual — ₱950</option>
-                <option value="21K Individual" data-price="1450" data-pax="1">21K Individual — ₱1,450</option>
-                <option value="Duathlon Solo" data-price="1800" data-pax="1">Duathlon Solo — ₱1,800</option>
-                <option value="Duathlon Relay" data-price="2800" data-pax="2">Duathlon Relay (2) — ₱2,800</option>
-                <option value="Squad 5K" data-price="3000" data-pax="5">Squad 5K (5) — ₱3,000</option>
+                <option value="3KM Individual" data-price="500" data-pax="1" selected>3KM Individual — ₱500</option>
+                <option value="5KM Individual" data-price="750" data-pax="1">5KM Individual — ₱750</option>
+                <option value="10KM Individual" data-price="1000" data-pax="1">10KM Individual — ₱1,000</option>
+                <option value="Duathlon (5K-20K-3K)" data-price="2000" data-pax="1">Duathlon (5K-20K-3K) — ₱2,000</option>
               </select>
               <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-stride-volt">▼</div>
             </div>
           </div>
           <div>
-            <label for="shirt" class="block font-mono text-[11px] tracking-wider text-white/50 mb-2 uppercase">Shirt Size</label>
+            <label for="shirt" class="block font-mono text-[11px] tracking-wider text-white/50 mb-2 uppercase">Shirt Size (Included)</label>
             <div class="relative">
               <select id="shirt" class="w-full bg-white/5 border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk font-light text-sm px-4 py-3 outline-none appearance-none cursor-pointer transition-colors duration-300">
                 <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
@@ -578,23 +591,23 @@ tailwind.config = {
         </div>
 
         <div>
-          <label class="block font-mono text-[11px] tracking-wider text-white/50 mb-2 uppercase">Runner Names <span class="text-white/30 normal-case tracking-normal">(one bib per runner — required for every teammate)</span></label>
+          <label class="block font-mono text-[11px] tracking-wider text-white/50 mb-2 uppercase">Runner Name on Bib</label>
           <div id="runner-names" class="space-y-3"></div>
         </div>
 
         <div>
-          <label for="referrer" class="block font-mono text-[11px] tracking-wider text-white/50 mb-2 uppercase">Team / Squad Name <span class="text-white/30 normal-case tracking-normal">(optional)</span></label>
-          <input type="text" id="referrer" placeholder="Only if racing as a relay or squad" class="w-full bg-white/5 border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk font-light text-sm px-4 py-3 outline-none transition-colors duration-300">
+          <label for="referrer" class="block font-mono text-[11px] tracking-wider text-white/50 mb-2 uppercase">Running Club / Team Name <span class="text-white/30 normal-case tracking-normal">(optional)</span></label>
+          <input type="text" id="referrer" placeholder="Your club or affiliation" class="w-full bg-white/5 border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk font-light text-sm px-4 py-3 outline-none transition-colors duration-300">
         </div>
 
         <div class="border-t border-white/10 pt-6 flex justify-between items-center font-mono">
           <span class="text-xs text-white/50 uppercase">Estimated total</span>
-          <span id="estimated-total" class="text-xl md:text-2xl font-bold text-stride-volt">₱750</span>
+          <span id="estimated-total" class="text-xl md:text-2xl font-bold text-stride-volt">₱500</span>
         </div>
         <div class="flex items-start space-x-3 pt-2">
           <input type="checkbox" id="verify-terms" required class="mt-1 w-4 h-4 accent-stride-ignite border-white/10 bg-white/5 rounded cursor-pointer">
           <label for="verify-terms" class="text-xs text-white/50 font-light leading-relaxed cursor-pointer select-none">
-            I confirm every runner listed is medically fit to race, agrees to follow marshal instructions, and has read the <a href="#faq" onclick="event.stopPropagation()" class="text-stride-volt underline underline-offset-2 hover:text-white transition-colors">race rules</a> — registrations are final and non-refundable.
+            I confirm that I am medically fit to race, agree to follow marshal instructions, and have read the <a href="#faq" onclick="event.stopPropagation()" class="text-stride-volt underline underline-offset-2 hover:text-white transition-colors">race rules</a> — registrations are final and non-refundable.
           </label>
         </div>
         <button type="submit" class="w-full py-4 rounded-full bg-stride-ignite text-white font-mono text-xs font-bold tracking-[0.2em] hover:bg-stride-volt hover:text-stride-ink transition-colors duration-300 uppercase">
@@ -606,78 +619,42 @@ tailwind.config = {
 </section>
 
 <!-- FAQ -->
-<section id="faq" class="py-28 border-t border-stride-ink/5">
+<section id="faq" class="py-28 border-t border-stride-ink/5 bg-stride-chalk">
   <div class="max-w-3xl mx-auto px-6">
     <div class="text-center mb-16" data-reveal>
-      <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">Before the gun goes off</span>
-      <h2 class="font-display text-4xl md:text-6xl tracking-wide">FAQ</h2>
+      <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">Before race day</span>
+      <h2 class="font-display text-4xl md:text-6xl tracking-wide text-stride-ink">FAQ</h2>
       <div class="w-16 h-[3px] bg-stride-ignite mx-auto mt-6"></div>
     </div>
 
     <div class="space-y-4" data-reveal>
       <div class="faq-item bg-white border border-stride-ink/10 rounded-2xl hover:border-stride-ignite/40 transition-colors">
         <button class="faq-trigger w-full flex justify-between items-center text-left px-6 py-5">
-          <span class="font-display text-lg tracking-wide">When and where do I pick up my bib?</span>
+          <span class="font-display text-lg tracking-wide text-stride-ink">What are the package inclusions?</span>
           <span class="faq-icon text-stride-ignite text-xl font-mono shrink-0 ml-4">+</span>
         </button>
-        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">Bib and kit pickup runs 4:00–5:00 AM at Stride Village on race morning. Bring your confirmation email and a valid ID — the name on your bib must match your registration.</p></div>
+        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">All categories (3K, 5K, 10K, and Duathlon) include an official Project Stride Race Shirt, personalized Race Bib, Finisher’s Medal upon crossing the finish line, and Bottled Water / hydration station access.</p></div>
       </div>
       <div class="faq-item bg-white border border-stride-ink/10 rounded-2xl hover:border-stride-ignite/40 transition-colors">
         <button class="faq-trigger w-full flex justify-between items-center text-left px-6 py-5">
-          <span class="font-display text-lg tracking-wide">What happens if I miss the cutoff?</span>
+          <span class="font-display text-lg tracking-wide text-stride-ink">When and where is the race?</span>
           <span class="faq-icon text-stride-ignite text-xl font-mono shrink-0 ml-4">+</span>
         </button>
-        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">Each category has its own cutoff (5K 1.5 hrs, 10K 2 hrs, 21K 3.5 hrs, Duathlon 3 hrs). Sweeper vehicles pick up runners past cutoff and bring them to the finish — your chip time still counts, but course support closes.</p></div>
+        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">The race will be held on Saturday, November 28, 2026, at Lima Estate, Malvar, Batangas. Gun starts commence at 5:00 AM beginning with the Duathlon.</p></div>
       </div>
       <div class="faq-item bg-white border border-stride-ink/10 rounded-2xl hover:border-stride-ignite/40 transition-colors">
         <button class="faq-trigger w-full flex justify-between items-center text-left px-6 py-5">
-          <span class="font-display text-lg tracking-wide">Do I need my own bike for the Duathlon?</span>
+          <span class="font-display text-lg tracking-wide text-stride-ink">Do I need my own bike and helmet for the Duathlon?</span>
           <span class="faq-icon text-stride-ignite text-xl font-mono shrink-0 ml-4">+</span>
         </button>
-        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">Yes — bring your own bike in roadworthy condition. A helmet is mandatory for the entire bike leg, no exceptions, and your bike must be racked in your assigned transition slot before the gun.</p></div>
+        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">Yes — athletes must bring their own roadworthy bicycle. A standard helmet is mandatory for the entire 20K bike segment. No helmet, no race.</p></div>
       </div>
       <div class="faq-item bg-white border border-stride-ink/10 rounded-2xl hover:border-stride-ignite/40 transition-colors">
         <button class="faq-trigger w-full flex justify-between items-center text-left px-6 py-5">
-          <span class="font-display text-lg tracking-wide">Where are the hydration stations?</span>
+          <span class="font-display text-lg tracking-wide text-stride-ink">Can I get a refund or transfer my slot?</span>
           <span class="faq-icon text-stride-ignite text-xl font-mono shrink-0 ml-4">+</span>
         </button>
-        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">Six stations across the longer courses, spaced roughly every 3–4K, each stocked with water, electrolyte drink, and a medical volunteer on standby.</p></div>
-      </div>
-      <div class="faq-item bg-white border border-stride-ink/10 rounded-2xl hover:border-stride-ignite/40 transition-colors">
-        <button class="faq-trigger w-full flex justify-between items-center text-left px-6 py-5">
-          <span class="font-display text-lg tracking-wide">What if it rains?</span>
-          <span class="faq-icon text-stride-ignite text-xl font-mono shrink-0 ml-4">+</span>
-        </button>
-        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">The race runs rain or shine. We only delay or shorten the course for lightning, flooding, or a marshal safety call — updates go out by email and at the start village.</p></div>
-      </div>
-      <div class="faq-item bg-white border border-stride-ink/10 rounded-2xl hover:border-stride-ignite/40 transition-colors">
-        <button class="faq-trigger w-full flex justify-between items-center text-left px-6 py-5">
-          <span class="font-display text-lg tracking-wide">Can I get a refund or transfer my slot?</span>
-          <span class="faq-icon text-stride-ignite text-xl font-mono shrink-0 ml-4">+</span>
-        </button>
-        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">All registrations are final — no refunds, no transfers, no deferrals to next year. Double-check your category, runner names, and shirt sizes before you confirm.</p></div>
-      </div>
-    </div>
-
-    <!-- RACE RULES -->
-    <div data-reveal class="mt-20">
-      <div class="text-center mb-10">
-        <span class="font-mono text-[11px] tracking-[0.3em] text-stride-ignite uppercase block mb-3">On the course</span>
-        <h3 class="font-display text-3xl md:text-4xl tracking-wide">RACE RULES</h3>
-        <div class="w-12 h-[3px] bg-stride-ignite mx-auto mt-5"></div>
-      </div>
-      <div class="bg-stride-ink text-stride-chalk rounded-3xl p-7 md:p-10">
-        <ul class="space-y-5">
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">01</span><p class="text-sm font-light leading-relaxed">Your bib must be visible and worn on the front for the entire race.</p></li>
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">02</span><p class="text-sm font-light leading-relaxed">Helmets are mandatory for the full bike leg of the Duathlon — no exceptions.</p></li>
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">03</span><p class="text-sm font-light leading-relaxed">Stay on the marked route and follow all marshal and traffic-management instructions.</p></li>
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">04</span><p class="text-sm font-light leading-relaxed">Keep one ear free of headphones on any stretch that shares the road with traffic.</p></li>
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">05</span><p class="text-sm font-light leading-relaxed">No bib transfers or bandit runners — every person on course must be wearing their own registered bib.</p></li>
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">06</span><p class="text-sm font-light leading-relaxed">Runners with pre-existing conditions should be medically cleared before starting the 21K or Duathlon.</p></li>
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">07</span><p class="text-sm font-light leading-relaxed">Please don't litter — drop cups and gels only at designated hydration stations.</p></li>
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">08</span><p class="text-sm font-light leading-relaxed">Cutoff times are enforced. Sweeper vehicles will pick up runners past the cutoff for their category.</p></li>
-          <li class="flex items-start gap-4"><span class="font-mono text-[10px] text-stride-volt pt-[3px] shrink-0">09</span><p class="text-sm font-light leading-relaxed">Organizers may withdraw any runner whose conduct is unsafe or disruptive, without refund.</p></li>
-        </ul>
+        <div class="faq-answer px-6"><p class="text-stride-mute text-sm font-light leading-relaxed pb-5">All registrations are strictly non-refundable and non-transferable. Please verify your chosen category, shirt size, and details prior to completing payment.</p></div>
       </div>
     </div>
   </div>
@@ -690,13 +667,13 @@ tailwind.config = {
       <h3 class="font-display text-2xl tracking-wide text-stride-ignite">CONFIRM YOUR ENTRY</h3>
       <button id="close-confirm" class="text-stride-mute hover:text-stride-ink text-xl font-bold font-mono outline-none">&times;</button>
     </div>
-    <p class="text-stride-mute text-xs font-light mb-6 leading-relaxed">Double-check your details — registrations are final and runner names can't be changed after payment.</p>
+    <p class="text-stride-mute text-xs font-light mb-6 leading-relaxed">Double-check your registration summary before proceeding to payment.</p>
     <div class="bg-stride-chalk border border-stride-ink/10 rounded-2xl p-4 space-y-2 text-xs font-mono mb-6">
       <div class="flex justify-between"><span class="text-stride-mute">RUNNER NAME</span><span id="confirm-name" class="text-stride-ink">—</span></div>
       <div class="flex justify-between"><span class="text-stride-mute">EMAIL</span><span id="confirm-email" class="text-stride-ink truncate ml-4 max-w-[60%] text-right">—</span></div>
       <div class="flex justify-between"><span class="text-stride-mute">CATEGORY</span><span id="confirm-package" class="text-stride-ink">—</span></div>
       <div class="flex justify-between"><span class="text-stride-mute">SHIRT SIZE</span><span id="confirm-shirt" class="text-stride-ink">—</span></div>
-      <div id="confirm-referrer-row" style="display:none" class="flex justify-between"><span class="text-stride-mute">TEAM NAME</span><span id="confirm-referrer" class="text-stride-ink truncate ml-4 max-w-[60%] text-right">—</span></div>
+      <div id="confirm-referrer-row" style="display:none" class="flex justify-between"><span class="text-stride-mute">TEAM</span><span id="confirm-referrer" class="text-stride-ink truncate ml-4 max-w-[60%] text-right">—</span></div>
       <div class="border-t border-stride-ink/10 pt-2 flex justify-between text-sm font-bold"><span class="text-stride-ignite">TOTAL</span><span id="confirm-total" class="text-stride-ignite">₱0.00</span></div>
     </div>
     <div class="grid grid-cols-2 gap-4">
@@ -714,24 +691,24 @@ tailwind.config = {
       <button id="close-payment" class="text-stride-mute hover:text-stride-ink text-xl font-bold font-mono outline-none">&times;</button>
     </div>
     <p class="text-stride-mute text-xs font-light mb-6 leading-relaxed relative z-10">
-      Scan the QR code below to pay via GCash or your bank app. Your total is <strong id="payment-total-ui" class="text-stride-ignite font-mono">₱0.00</strong>.
+      Scan the QR code below via GCash / Maya / Bank app. Your total is <strong id="payment-total-ui" class="text-stride-ignite font-mono">₱0.00</strong>.
     </p>
     <div class="relative z-10 mb-6">
       <div class="bg-stride-chalk p-6 rounded-2xl mx-auto w-64 h-64 flex items-center justify-center border-4 border-stride-ignite/20">
         <svg viewBox="0 0 100 100" class="w-40 h-40 opacity-70">
-          <rect x="4" y="4" width="26" height="26" fill="none" stroke="#0A2F6B" stroke-width="6"/>
-          <rect x="70" y="4" width="26" height="26" fill="none" stroke="#0A2F6B" stroke-width="6"/>
-          <rect x="4" y="70" width="26" height="26" fill="none" stroke="#0A2F6B" stroke-width="6"/>
-          <rect x="42" y="4" width="8" height="8" fill="#FF4612"/>
-          <rect x="58" y="20" width="8" height="8" fill="#FF4612"/>
-          <rect x="42" y="42" width="16" height="16" fill="#0A2F6B"/>
-          <rect x="70" y="42" width="8" height="8" fill="#FF4612"/>
-          <rect x="42" y="70" width="8" height="8" fill="#FF4612"/>
-          <rect x="58" y="86" width="8" height="8" fill="#FF4612"/>
-          <rect x="80" y="70" width="16" height="16" fill="#0A2F6B"/>
+          <rect x="4" y="4" width="26" height="26" fill="none" stroke="#1A3668" stroke-width="6"/>
+          <rect x="70" y="4" width="26" height="26" fill="none" stroke="#1A3668" stroke-width="6"/>
+          <rect x="4" y="70" width="26" height="26" fill="none" stroke="#1A3668" stroke-width="6"/>
+          <rect x="42" y="4" width="8" height="8" fill="#C1121F"/>
+          <rect x="58" y="20" width="8" height="8" fill="#C1121F"/>
+          <rect x="42" y="42" width="16" height="16" fill="#1A3668"/>
+          <rect x="70" y="42" width="8" height="8" fill="#C1121F"/>
+          <rect x="42" y="70" width="8" height="8" fill="#C1121F"/>
+          <rect x="58" y="86" width="8" height="8" fill="#C1121F"/>
+          <rect x="80" y="70" width="16" height="16" fill="#1A3668"/>
         </svg>
       </div>
-      <p class="text-center font-mono text-[10px] tracking-[0.25em] text-stride-ignite uppercase mt-3">Scan to pay — placeholder QR</p>
+      <p class="text-center font-mono text-[10px] tracking-[0.25em] text-stride-ignite uppercase mt-3">Scan to pay</p>
     </div>
     <div class="mb-6 relative z-10">
       <label for="receipt-upload" class="block font-mono text-[11px] tracking-wider text-stride-mute mb-2 uppercase">Upload Screenshot</label>
@@ -745,12 +722,8 @@ tailwind.config = {
 <div id="submitted-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-stride-ink/85 backdrop-blur-md hidden">
   <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center relative overflow-hidden">
     <div class="w-16 h-16 rounded-full border border-stride-ignite flex items-center justify-center text-2xl text-stride-ignite mx-auto mb-6">✓</div>
-    <h3 class="font-display text-3xl tracking-wide mb-2">RECEIPT UPLOADED</h3>
-    <p class="text-stride-mute text-xs font-light mb-4 max-w-xs mx-auto">We're verifying your payment. Your official race bib and pickup pass will be emailed once confirmed.</p>
-    <p class="text-stride-ignite/90 text-xs font-light mb-8 max-w-xs mx-auto">
-      <span class="font-mono text-[10px] tracking-[0.2em] uppercase block mb-1">Heads up</span>
-      Check your <strong class="font-semibold">spam or promotions</strong> folder if it doesn't land within the day.
-    </p>
+    <h3 class="font-display text-3xl tracking-wide mb-2 text-stride-ink">RECEIPT UPLOADED</h3>
+    <p class="text-stride-mute text-xs font-light mb-4 max-w-xs mx-auto">We are verifying your transaction. Your official race kit claiming pass will be emailed once confirmed.</p>
     <div class="bg-stride-chalk border border-stride-ink/10 rounded-2xl p-4 space-y-2 text-xs font-mono mb-8 text-left">
       <div class="flex justify-between"><span class="text-stride-mute">RUNNER NAME</span><span id="submitted-name" class="text-stride-ink">—</span></div>
       <div class="flex justify-between"><span class="text-stride-mute">CATEGORY</span><span id="submitted-package" class="text-stride-ink">—</span></div>
@@ -764,16 +737,16 @@ tailwind.config = {
 <div id="receipt-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-stride-ink/90 backdrop-blur-md hidden">
   <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center relative overflow-hidden">
     <div class="w-16 h-16 rounded-full border border-stride-ignite flex items-center justify-center text-2xl text-stride-ignite mx-auto mb-6">✓</div>
-    <h3 class="font-display text-3xl tracking-wide mb-2">YOU'RE ON THE START LIST</h3>
-    <p class="text-stride-mute text-xs font-light mb-8 max-w-xs mx-auto">Show this pass at bib pickup on race morning.</p>
+    <h3 class="font-display text-3xl tracking-wide mb-2 text-stride-ink">YOU'RE ON THE START LIST</h3>
+    <p class="text-stride-mute text-xs font-light mb-8 max-w-xs mx-auto">Present this digital pass at bib and kit pickup.</p>
     <div class="bib-card bg-stride-chalk border-dashed border-2 border-stride-ignite/40 rounded-2xl p-6 space-y-4 text-left font-mono text-xs mb-8">
       <div class="flex justify-between border-b border-stride-ink/10 pb-3"><span class="text-stride-mute">RUNNER</span><span id="ticket-name" class="text-stride-ink font-bold">—</span></div>
       <div class="flex justify-between"><span class="text-stride-mute">CATEGORY</span><span id="ticket-package" class="text-stride-ink">—</span></div>
       <div class="flex justify-between"><span class="text-stride-mute">SHIRT SIZE</span><span id="ticket-shirt" class="text-stride-ink">—</span></div>
-      <div class="flex justify-between"><span class="text-stride-mute">PICKUP POINT</span><span class="text-stride-ink">Stride Village</span></div>
+      <div class="flex justify-between"><span class="text-stride-mute">VENUE</span><span class="text-stride-ink">Lima Estate, Malvar</span></div>
       <div class="flex justify-between border-t border-stride-ink/10 pt-3 text-sm font-bold text-stride-ignite"><span>BIB CODE</span><span id="ticket-code">STR-PENDING</span></div>
     </div>
-    <button id="close-receipt" class="w-full py-4 rounded-full bg-stride-ignite text-white font-mono text-xs font-bold tracking-[0.2em] hover:bg-stride-ink transition-colors duration-300 uppercase">Close &amp; download pass</button>
+    <button id="close-receipt" class="w-full py-4 rounded-full bg-stride-ignite text-white font-mono text-xs font-bold tracking-[0.2em] hover:bg-stride-ink transition-colors duration-300 uppercase">Close pass</button>
   </div>
 </div>
 
@@ -784,8 +757,13 @@ tailwind.config = {
   <div class="chevron-strip dark mb-16"></div>
   <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-12">
     <div class="space-y-4 md:col-span-2">
-      <div class="font-display text-2xl tracking-wide text-white">PROJECT <span class="text-stride-ignite">STRIDE</span> <span class="text-stride-volt">26</span></div>
-      <p class="text-white/50 text-xs leading-relaxed max-w-sm font-light">A fun run and duathlon built for every pace — 5K, 10K, 21K, and Run–Bike–Run, one shared start village and finish line.</p>
+      
+      <!-- LOGO: Footer -->
+      <div class="flex items-center mb-4">
+        <img src="442497274_419117694308411_2751438522990521029_n.jpg" alt="Event Logo" class="h-16 w-auto object-contain rounded-full shadow-lg">
+      </div>
+
+      <p class="text-white/50 text-xs leading-relaxed max-w-sm font-light">Project Stride 2026 at Lima Estate, Malvar, Batangas — 3KM, 5KM, 10KM, and Duathlon (5K–20K–3K).</p>
     </div>
     <div class="space-y-4">
       <h4 class="font-mono text-stride-volt text-[11px] tracking-widest uppercase font-bold">Navigate</h4>
@@ -799,9 +777,10 @@ tailwind.config = {
       </ul>
     </div>
     <div class="space-y-4 font-light">
-      <h4 class="font-mono text-stride-volt text-[11px] tracking-widest uppercase font-bold">Contact</h4>
+      <h4 class="font-mono text-stride-volt text-[11px] tracking-widest uppercase font-bold">Location &amp; Inquiries</h4>
       <p class="text-white/70">hello@projectstride.ph</p>
-      <p class="text-white/50"><!-- EDIT: venue address --> [Venue address TBA]</p>
+      <p class="text-white/50">Lima Estate, Malvar, Batangas</p>
+      <p class="text-white/50">Saturday, November 28, 2026</p>
     </div>
   </div>
   <div class="max-w-7xl mx-auto px-6 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
@@ -819,8 +798,8 @@ tailwind.config = {
   'use strict';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Countdown — EDIT eventDate once the real race date is set */
-  const eventDate = new Date('2026-11-15T05:00:00+08:00').getTime();
+  /* Target countdown date: Nov 28, 2026 at 5:00 AM (GMT+8) */
+  const eventDate = new Date('2026-11-28T05:00:00+08:00').getTime();
   const cd = { d: document.getElementById('cd-days'), h: document.getElementById('cd-hours'), m: document.getElementById('cd-mins'), s: document.getElementById('cd-secs') };
   const pad = (n) => String(n).padStart(2, '0');
   function tick() {
@@ -884,10 +863,10 @@ tailwind.config = {
 
   /* Course map tabs */
   const routeCaptions = {
-    '5k': { title: '5K Route', text: 'One flat loop through the park, closed to traffic the whole way. No turns sharper than a jog.' },
-    '10k': { title: '10K Route', text: 'A rolling out-and-back with a timed split at the 5K turn point — a fair, honest 10.' },
-    '21k': { title: '21K Route', text: 'The full certified half marathon loop, with splits at 10K and 18K to pace yourself against.' },
-    'du': { title: 'Duathlon Route', text: 'Run out to T1, mount up for the 20K bike loop, rack at T2, and close it out on foot.' },
+    '3k': { title: '3K Route', text: 'A smooth, flat 1.5K out-and-back loop within Lima Estate — ideal for families and first-time runners.' },
+    '5k': { title: '5K Route', text: 'Wide avenues and flat asphalt through Lima Estate, fully marshaled with water points.' },
+    '10k': { title: '10K Route', text: 'A full perimeter loop across Lima Estate with splits every 2.5K.' },
+    'du': { title: 'Duathlon Route', text: '5K initial run leg, mount up at Stride Village transition for 20K bike, finish with a fast 3K run.' },
   };
   const routeTabs = document.querySelectorAll('.route-tab');
   const routePanels = document.querySelectorAll('.route-panel');
@@ -903,7 +882,7 @@ tailwind.config = {
     });
   });
 
-  /* Registration pricing + package select buttons */
+  /* Registration pricing + package select */
   const packageSel = document.getElementById('package');
   const estimatedTotal = document.getElementById('estimated-total');
   const runnerNamesWrap = document.getElementById('runner-names');
@@ -945,17 +924,17 @@ tailwind.config = {
       e.preventDefault();
       const pkg = btn.getAttribute('data-package');
       for (const opt of packageSel.options) {
-        if (opt.value.startsWith(pkg) || pkg.startsWith(opt.value) || opt.value === pkg) { packageSel.value = opt.value; break; }
+        if (opt.value === pkg || opt.value.startsWith(pkg) || pkg.startsWith(opt.value)) { 
+          packageSel.value = opt.value; 
+          break; 
+        }
       }
-      // fallback: match closest known option text
-      const map = { '5K Individual':'5K Individual', '10K Individual':'10K Individual', '21K Individual':'21K Individual', 'Duathlon Solo':'Duathlon Solo', 'Duathlon Relay':'Duathlon Relay', 'Squad 5K':'Squad 5K' };
-      if (map[pkg]) packageSel.value = map[pkg];
       syncPackage();
       document.getElementById('register').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   });
 
-  /* Registration form -> confirm -> payment -> submitted -> bib pass flow */
+  /* Modals flow */
   const registerForm = document.getElementById('register-form');
   const confirmModal = document.getElementById('confirm-modal');
   const paymentModal = document.getElementById('payment-modal');

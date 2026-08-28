@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Stride 2026 — Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Export libraries: SheetJS (xlsx) + jsPDF with the AutoTable plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Anton', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            stride: {
+              ink: '#152243',      
+              chalk: '#FFFFFF',    
+              cobalt: '#1A3668',   
+              cobaltDeep: '#0F2043', 
+              ignite: '#C1121F',   
+              volt: '#FCD116',     
+              mute: '#7A8C99',     
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script>window.API_BASE = "https://api.projectstride.ph";</script>
+</head>
+<body class="bg-stride-ink text-stride-chalk font-sans antialiased min-h-screen">
+
+  <!-- LOGIN GATE -->
+  <div id="gate" class="min-h-screen flex items-center justify-center px-6">
+    <div class="w-full max-w-sm bg-stride-cobaltDeep border border-white/10 rounded-3xl p-8 shadow-2xl">
+      <h1 class="font-display text-4xl tracking-wide text-stride-volt mb-2">STRIDE ADMIN</h1>
+      <p class="text-stride-mute text-xs font-light mb-6">Enter the master key to view the runner manifest.</p>
+      <input id="key-input" type="password" placeholder="Admin key"
+             class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-3 outline-none mb-4 transition-colors">
+      <button id="key-submit" class="w-full py-3 rounded-full bg-stride-ignite text-white font-mono text-xs font-bold tracking-widest uppercase hover:bg-stride-volt hover:text-stride-ink transition-colors">Authorize</button>
+      <p id="gate-error" class="text-stride-ignite text-xs font-mono mt-4 hidden text-center"></p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash" class="hidden max-w-screen-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+    
+    <!-- Header & Actions -->
+    <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-8">
+      <div>
+        <h1 class="font-display text-4xl sm:text-5xl tracking-wide text-stride-chalk leading-none">RUNNER MANIFEST</h1>
+        <p class="text-stride-volt text-xs font-mono tracking-[0.2em] uppercase mt-2">Project Stride 2026 — Lima Estate</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="remind-pending" title="Send payment reminders to checked pending bookings" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-volt/40 text-stride-volt hover:bg-stride-volt/10 rounded-full px-4 py-2 transition-colors">Remind Pending</button>
+        <button id="export-xlsx" title="Full Excel export" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-emerald-400/40 text-emerald-400 hover:bg-emerald-400/10 rounded-full px-4 py-2 transition-colors">Excel Data</button>
+        <button id="export-pdf" title="Printable A4 passenger manifest" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-chalk/40 text-stride-chalk hover:bg-white/10 rounded-full px-4 py-2 transition-colors">Export PDF</button>
+        <button id="refresh" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-cobalt bg-stride-cobalt text-white hover:bg-stride-ink rounded-full px-4 py-2 transition-colors">Refresh</button>
+        <button id="logout" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase text-stride-mute hover:text-stride-ignite rounded-full px-4 py-2 transition-colors">Log out</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+        <div class="font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-2">Confirmed Revenue</div>
+        <div id="stat-revenue" class="font-display text-3xl tracking-wide text-stride-volt">₱0</div>
+      </div>
+      <div class="bg-stride-cobalt/20 border border-stride-cobalt rounded-2xl p-5">
+        <div class="font-mono text-[10px] tracking-widest text-stride-chalk uppercase mb-2">Needs Approval</div>
+        <div id="stat-verifying" class="font-display text-3xl tracking-wide text-white">0</div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+        <div class="font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-2">Confirmed Entries</div>
+        <div id="stat-confirmed" class="font-display text-3xl tracking-wide text-stride-chalk">0</div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+        <div class="font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-2">Pending</div>
+        <div id="stat-pending" class="font-display text-3xl tracking-wide text-stride-chalk">0</div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+        <div class="font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-2">Total Runners (Pax)</div>
+        <div id="stat-guests" class="font-display text-3xl tracking-wide text-stride-chalk">0</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-2 mb-4" id="filters">
+      <button data-filter="all"       class="filter-btn font-mono text-[10px] sm:text-[11px] tracking-widest uppercase rounded-full px-4 py-2 border border-stride-volt bg-stride-volt text-stride-ink font-bold transition-colors">All</button>
+      <button data-filter="verifying" class="filter-btn font-mono text-[10px] sm:text-[11px] tracking-widest uppercase rounded-full px-4 py-2 border border-white/20 text-stride-mute hover:border-stride-chalk hover:text-stride-chalk transition-colors">Needs Approval</button>
+      <button data-filter="confirmed" class="filter-btn font-mono text-[10px] sm:text-[11px] tracking-widest uppercase rounded-full px-4 py-2 border border-white/20 text-stride-mute hover:border-stride-chalk hover:text-stride-chalk transition-colors">Confirmed</button>
+      <button data-filter="pending"   class="filter-btn font-mono text-[10px] sm:text-[11px] tracking-widest uppercase rounded-full px-4 py-2 border border-white/20 text-stride-mute hover:border-stride-chalk hover:text-stride-chalk transition-colors">Pending</button>
+      <button data-filter="cancelled" class="filter-btn font-mono text-[10px] sm:text-[11px] tracking-widest uppercase rounded-full px-4 py-2 border border-white/20 text-stride-mute hover:border-stride-ignite hover:text-stride-ignite transition-colors">Cancelled</button>
+    </div>
+
+    <div id="export-hint" class="font-mono text-[11px] text-stride-mute mb-4">&nbsp;</div>
+
+    <!-- Data Table -->
+    <div class="bg-stride-cobaltDeep border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+      <div class="hidden lg:block overflow-x-auto">
+        <table class="w-full text-sm min-w-[1200px] text-left whitespace-nowrap">
+          <thead class="bg-stride-ink text-stride-mute font-mono text-[10px] tracking-widest uppercase">
+            <tr>
+              <th class="px-4 py-4 w-10 text-center"><input type="checkbox" id="select-all-cb" title="Select all" class="rounded bg-stride-ink border-white/20 accent-stride-volt cursor-pointer w-4 h-4"></th>
+              <th class="px-4 py-4">Runner (Lead)</th>
+              <th class="px-4 py-4">Emergency Contact</th>
+              <th class="px-4 py-4">Team / Club</th>
+              <th class="px-4 py-4">Package</th>
+              <th class="px-4 py-4">Shirt</th>
+              <th class="px-4 py-4">Pax</th>
+              <th class="px-4 py-4">Total</th>
+              <th class="px-4 py-4">Receipt</th>
+              <th class="px-4 py-4">Status</th>
+              <th class="px-4 py-4">Bib Code</th>
+              <th class="px-4 py-4">Created</th>
+              <th class="px-4 py-4 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="rows" class="divide-y divide-white/5"></tbody>
+        </table>
+      </div>
+
+      <!-- Mobile List View -->
+      <div class="lg:hidden">
+        <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-stride-ink">
+          <input type="checkbox" id="select-all-cb-mobile" class="rounded bg-stride-ink border-white/20 accent-stride-volt cursor-pointer w-4 h-4">
+          <label for="select-all-cb-mobile" class="font-mono text-[10px] tracking-widest text-stride-mute uppercase">Select all</label>
+        </div>
+        <div id="rows-mobile" class="divide-y divide-white/5"></div>
+      </div>
+
+      <div id="empty" class="hidden text-center text-stride-mute text-sm font-light py-12">No bookings found.</div>
+      <div id="loading" class="text-center text-stride-mute text-sm font-light py-12">Fetching manifest…</div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-stride-ink/90 backdrop-blur-sm p-4">
+    <div class="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-stride-cobaltDeep border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="font-display text-3xl tracking-wide text-stride-chalk leading-none">EDIT ENTRY</h2>
+          <p id="edit-subtitle" class="font-mono text-[10px] tracking-widest text-stride-volt uppercase mt-2">&nbsp;</p>
+        </div>
+        <button id="edit-close" class="text-stride-mute hover:text-white text-3xl leading-none">&times;</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Lead Runner Name</label>
+          <input id="edit-full_name" type="text" class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none transition-colors">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Email</label>
+            <input id="edit-email" type="email" class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Phone</label>
+            <input id="edit-phone" type="text" class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none transition-colors">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Emergency Contact</label>
+            <input id="edit-emergency" type="text" class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Team / Club</label>
+            <input id="edit-team" type="text" class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none transition-colors">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Package</label>
+            <select id="edit-package" class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none transition-colors">
+              <option value="3KM Individual">3KM Individual</option>
+              <option value="5KM Individual">5KM Individual</option>
+              <option value="10KM Individual">10KM Individual</option>
+              <option value="Duathlon (5K-20K-3K)">Duathlon (5K-20K-3K)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Shirt Size</label>
+            <select id="edit-shirt" class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none transition-colors">
+              <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Pax (Quantity)</label>
+          <input id="edit-guests" type="number" min="1" class="w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none transition-colors">
+        </div>
+
+        <div>
+          <label class="block font-mono text-[10px] tracking-widest text-stride-mute uppercase mb-1.5">Runner Names on Bibs</label>
+          <div id="edit-guest-names" class="space-y-2"></div>
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-white/10">
+          <span class="font-mono text-[10px] tracking-widest text-stride-mute uppercase">Estimated Total</span>
+          <span id="edit-total" class="font-display text-2xl tracking-wide text-stride-volt">₱0</span>
+        </div>
+
+        <p id="edit-error" class="text-stride-ignite text-xs font-mono hidden"></p>
+
+        <div class="flex gap-3 pt-4">
+          <button id="edit-cancel-btn" type="button" class="flex-1 font-mono text-[11px] tracking-widest uppercase border border-white/20 text-stride-mute hover:text-white hover:border-white/40 rounded-full py-3 transition-colors">Cancel</button>
+          <button id="edit-save" type="button" class="flex-1 font-mono text-[11px] tracking-widest uppercase bg-stride-volt text-stride-ink font-bold rounded-full py-3 hover:bg-white transition-colors">Save Updates</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    const API_BASE = (window.API_BASE || 'https://api.projectstride.ph').replace(/\/+$/, '');
+    const peso = (n) => '\u20B1' + Number(n || 0).toLocaleString('en-PH');
+    const $ = (id) => document.getElementById(id);
+
+    let adminKey = sessionStorage.getItem('stride_admin_key') || '';
+    let currentFilter = 'all';
+    let allRows = [];
+
+    const PACKAGES = {
+      '3KM Individual':       { price: 500 },
+      '5KM Individual':       { price: 750 },
+      '10KM Individual':      { price: 1000 },
+      'Duathlon (5K-20K-3K)': { price: 2000 },
+    };
+
+    function computeTotal(pkg, guests) {
+      return (PACKAGES[pkg] ? PACKAGES[pkg].price : 0) * guests;
+    }
+
+    const EVENT = {
+      name: 'Project Stride 2026',
+      date: 'November 28, 2026',
+      venue: 'Lima Estate, Malvar, Batangas',
+      boarding: 'Gun Start: 5:00 AM',
+    };
+
+    const NO_NAME = '(name not provided)';
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+        ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return isNaN(d) ? '—' : d.toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    // --- Auth & State ---
+    const gate = $('gate'), dash = $('dash');
+    function showDash() { gate.classList.add('hidden'); dash.classList.remove('hidden'); }
+    function showGate() { dash.classList.add('hidden'); gate.classList.remove('hidden'); }
+
+    async function tryKey(key) {
+      const res = await fetch(`${API_BASE}/api/bookings?limit=1`, { headers: { 'X-Admin-Key': key } });
+      return res.ok;
+    }
+
+    $('key-submit').addEventListener('click', submitKey);
+    $('key-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitKey(); });
+
+    async function submitKey() {
+      const key = $('key-input').value.trim();
+      const err = $('gate-error');
+      err.classList.add('hidden');
+      if (!key) return;
+      try {
+        if (await tryKey(key)) {
+          adminKey = key;
+          sessionStorage.setItem('stride_admin_key', key);
+          showDash();
+          load();
+        } else {
+          err.textContent = 'Invalid admin key.';
+          err.classList.remove('hidden');
+        }
+      } catch (e) {
+        err.textContent = 'Could not reach the server.';
+        err.classList.remove('hidden');
+      }
+    }
+
+    $('logout').addEventListener('click', () => {
+      sessionStorage.removeItem('stride_admin_key');
+      adminKey = '';
+      $('key-input').value = '';
+      showGate();
+    });
+
+    $('refresh').addEventListener('click', load);
+
+    // --- Filters ---
+    document.querySelectorAll('.filter-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        currentFilter = btn.getAttribute('data-filter');
+        document.querySelectorAll('.filter-btn').forEach((b) => {
+          const active = b === btn;
+          if (active) {
+             b.className = 'filter-btn font-mono text-[10px] sm:text-[11px] tracking-widest uppercase rounded-full px-4 py-2 border border-stride-volt bg-stride-volt text-stride-ink font-bold transition-colors';
+          } else {
+             b.className = 'filter-btn font-mono text-[10px] sm:text-[11px] tracking-widest uppercase rounded-full px-4 py-2 border border-white/20 text-stride-mute hover:border-stride-chalk hover:text-stride-chalk transition-colors';
+          }
+        });
+        render();
+      });
+    });
+
+    // --- Data Loading ---
+    async function load() {
+      $('loading').classList.remove('hidden');
+      $('empty').classList.add('hidden');
+      try {
+        const res = await fetch(`${API_BASE}/api/bookings?limit=1000`, { headers: { 'X-Admin-Key': adminKey } });
+        if (res.status === 401) { showGate(); return; }
+        allRows = await res.json();
+        stats();
+        render();
+      } catch (e) {
+        $('rows').innerHTML = '';
+        $('empty').textContent = 'Could not load records. Is the backend running?';
+        $('empty').classList.remove('hidden');
+      } finally {
+        $('loading').classList.add('hidden');
+      }
+    }
+
+    function stats() {
+      const confirmed = allRows.filter((r) => r.status === 'confirmed');
+      const verifying = allRows.filter((r) => r.status === 'verifying');
+      const pending = allRows.filter((r) => r.status === 'pending');
+      const revenue = confirmed.reduce((s, r) => s + (r.total_amount || 0), 0);
+      const guests = confirmed.reduce((s, r) => s + (r.guests || 0), 0);
+
+      $('stat-revenue').textContent = peso(revenue);
+      $('stat-verifying').textContent = verifying.length;
+      $('stat-confirmed').textContent = confirmed.length;
+      $('stat-pending').textContent = pending.length;
+      $('stat-guests').textContent = guests;
+    }
+
+    // --- Rendering ---
+    const STATUS_STYLE = {
+      confirmed: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10',
+      verifying: 'text-cyan-400 border-cyan-400/30 bg-cyan-400/10',
+      pending:   'text-stride-volt border-stride-volt/30 bg-stride-volt/10',
+      cancelled: 'text-stride-ignite border-stride-ignite/30 bg-stride-ignite/10',
+    };
+
+    function exportRows() {
+      return currentFilter === 'all' ? allRows : allRows.filter((r) => r.status === currentFilter);
+    }
+
+    // Builds a flat list of individual runners for exports
+    function buildManifest(rows) {
+      const out = [];
+      rows.forEach((r) => {
+        const lead = String(r.full_name || '').trim();
+        const names = Array.isArray(r.guest_names) ? r.guest_names.map((n) => String(n).trim()).filter(Boolean) : [];
+        const count = Math.max(Number(r.guests) || 0, names.length);
+        const slots = [];
+        
+        for (let i = 0; i < count; i++) slots.push(names[i] || '');
+        if (lead && !slots.includes(lead)) {
+          const gap = slots.indexOf('');
+          if (gap !== -1) slots[gap] = lead;
+        }
+
+        slots.forEach((name) => {
+          out.push({
+            runner_name: name || NO_NAME,
+            lead: lead,
+            package: r.package || '',
+            shirt: r.shirt_size || '—',
+            team: r.team_name || '—',
+            bib: r.bib_code || '—',
+            status: r.status || '',
+            phone: r.phone || '',
+            emergency: r.emergency_contact || '',
+          });
+        });
+      });
+      out.sort((a, b) => a.runner_name.localeCompare(b.runner_name, 'en'));
+      return out;
+    }
+
+    function updateExportHint() {
+      const rows = exportRows();
+      const manifest = buildManifest(rows);
+      const missing = manifest.filter((m) => m.runner_name === NO_NAME).length;
+      const el = $('export-hint');
+      if (!rows.length) { el.innerHTML = '&nbsp;'; return; }
+      
+      let txt = `Scope: ${currentFilter.toUpperCase()} — ${rows.length} booking(s), ${manifest.length} runner(s).`;
+      if (missing) {
+        el.textContent = txt + `  ⚠ ${missing} name(s) missing.`;
+        el.className = 'font-mono text-[11px] text-stride-ignite mb-4';
+      } else {
+        el.textContent = txt;
+        el.className = 'font-mono text-[11px] text-stride-mute mb-4';
+      }
+    }
+
+    function render() {
+      updateExportHint();
+      const cbDesktop = $('select-all-cb');
+      const cbMobile = $('select-all-cb-mobile');
+      if (cbDesktop) cbDesktop.checked = false;
+      if (cbMobile) cbMobile.checked = false;
+
+      const rows = exportRows();
+      const tbody = $('rows');
+      const cardsWrap = $('rows-mobile');
+      
+      if (!rows.length) {
+        tbody.innerHTML = '';
+        cardsWrap.innerHTML = '';
+        $('empty').textContent = 'No records found.';
+        $('empty').classList.remove('hidden');
+        return;
+      }
+      $('empty').classList.add('hidden');
+
+      const cardHtmlParts = [];
+      tbody.innerHTML = rows.map((r) => {
+        const badge = STATUS_STYLE[r.status] || 'text-stride-mute border-white/10';
+        const canCancel = r.status !== 'cancelled';
+        const canApprove = r.status === 'verifying';
+        const canSelect = r.status === 'pending'; // Only pending gets selected for reminders
+
+        const cbCell = canSelect
+          ? `<input type="checkbox" class="row-cb rounded bg-stride-ink border-white/20 accent-stride-volt cursor-pointer w-4 h-4" value="${escapeHtml(r.id)}">`
+          : `<span class="text-white/20 text-xs">—</span>`;
+
+        let guestsCell = escapeHtml(r.guests);
+        const gnames = Array.isArray(r.guest_names) ? r.guest_names.filter(n => String(n).trim()) : [];
+        if (gnames.length > 1) {
+          const list = gnames.map((n, i) => `<div class="text-xs py-0.5">${i+1}. ${escapeHtml(n)}</div>`).join('');
+          guestsCell = `<details class="cursor-pointer"><summary class="select-none">${escapeHtml(r.guests)} <span class="text-stride-volt text-[10px] font-mono">names ▾</span></summary><div class="mt-2 bg-black/30 border border-white/10 rounded p-2">${list}</div></details>`;
+        }
+
+        const receiptLink = r.receipt_url ? `<a href="${escapeHtml(r.receipt_url)}" target="_blank" class="text-cyan-400 underline hover:text-cyan-200">View</a>` : '—';
+        const emergency = r.emergency_contact ? escapeHtml(r.emergency_contact) : '—';
+        const team = r.team_name ? escapeHtml(r.team_name) : '—';
+        const shirt = r.shirt_size ? escapeHtml(r.shirt_size) : '—';
+
+        let actionButtons = '';
+        if (canCancel) {
+           actionButtons += `<button data-edit="${escapeHtml(r.id)}" class="font-mono text-[10px] tracking-widest uppercase text-stride-volt hover:text-white border border-stride-volt/30 hover:border-stride-volt rounded-full px-3 py-1 transition-colors mr-2">Edit</button>`;
+        }
+        if (canApprove) {
+           actionButtons += `<button data-approve="${escapeHtml(r.id)}" class="font-mono text-[10px] tracking-widest uppercase text-emerald-400 hover:text-white border border-emerald-400/30 hover:border-emerald-400 rounded-full px-3 py-1 transition-colors mr-2">Approve</button>`;
+        }
+        if (canCancel) {
+           actionButtons += `<button data-cancel="${escapeHtml(r.id)}" class="font-mono text-[10px] tracking-widest uppercase text-stride-ignite hover:text-white border border-stride-ignite/30 hover:border-stride-ignite rounded-full px-3 py-1 transition-colors">Cancel</button>`;
+        }
+        if (!actionButtons) actionButtons = `<span class="text-stride-mute text-xs">—</span>`;
+
+        // Mobile Card
+        cardHtmlParts.push(`
+        <div class="p-4 border-b border-white/5">
+          <div class="flex items-start gap-3">
+            ${cbCell.replace('class="row-cb', 'class="row-cb mt-1 shrink-0')}
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="text-white font-bold">${escapeHtml(r.full_name)}</div>
+                  <div class="text-stride-mute text-xs font-mono truncate">${escapeHtml(r.email)}</div>
+                </div>
+                <span class="shrink-0 font-mono text-[10px] tracking-widest uppercase border rounded-full px-2 py-1 ${badge}">${escapeHtml(r.status)}</span>
+              </div>
+              <div class="grid grid-cols-2 gap-x-3 gap-y-3 mt-4 text-xs">
+                <div><div class="font-mono text-[9px] tracking-widest text-stride-mute uppercase">Package</div><div class="text-white">${escapeHtml(r.package)}</div></div>
+                <div><div class="font-mono text-[9px] tracking-widest text-stride-mute uppercase">Bib Code</div><div class="text-stride-volt font-mono">${escapeHtml(r.bib_code || '—')}</div></div>
+                <div><div class="font-mono text-[9px] tracking-widest text-stride-mute uppercase">Team / Club</div><div class="text-white">${team}</div></div>
+                <div><div class="font-mono text-[9px] tracking-widest text-stride-mute uppercase">Shirt</div><div class="text-white">${shirt}</div></div>
+                <div><div class="font-mono text-[9px] tracking-widest text-stride-mute uppercase">Pax</div><div class="text-white">${guestsCell}</div></div>
+                <div><div class="font-mono text-[9px] tracking-widest text-stride-mute uppercase">Total</div><div class="text-stride-volt font-mono">${peso(r.total_amount)}</div></div>
+              </div>
+              <div class="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/5">
+                ${actionButtons}
+              </div>
+            </div>
+          </div>
+        </div>`);
+
+        return `<tr class="hover:bg-white/5 transition-colors">
+          <td class="px-4 py-4 text-center">${cbCell}</td>
+          <td class="px-4 py-4"><div class="text-white font-bold">${escapeHtml(r.full_name)}</div><div class="text-stride-mute text-xs font-mono">${escapeHtml(r.email)}</div></td>
+          <td class="px-4 py-4 text-white/80">${emergency}</td>
+          <td class="px-4 py-4 text-white/80">${team}</td>
+          <td class="px-4 py-4 text-white">${escapeHtml(r.package)}</td>
+          <td class="px-4 py-4 text-white">${shirt}</td>
+          <td class="px-4 py-4 text-white">${guestsCell}</td>
+          <td class="px-4 py-4 text-stride-volt font-mono font-bold">${peso(r.total_amount)}</td>
+          <td class="px-4 py-4 font-mono text-xs">${receiptLink}</td>
+          <td class="px-4 py-4"><span class="font-mono text-[10px] tracking-widest uppercase border rounded-full px-2 py-1 ${badge}">${escapeHtml(r.status)}</span></td>
+          <td class="px-4 py-4 font-mono text-xs text-stride-volt font-bold">${escapeHtml(r.bib_code || '—')}</td>
+          <td class="px-4 py-4 text-stride-mute text-xs font-mono">${fmtDate(r.created_at)}</td>
+          <td class="px-4 py-4 text-right">${actionButtons}</td>
+        </tr>`;
+      }).join('');
+
+      cardsWrap.innerHTML = cardHtmlParts.join('');
+
+      // Bind actions
+      [tbody, cardsWrap].forEach((container) => {
+        container.querySelectorAll('[data-cancel]').forEach((btn) => btn.addEventListener('click', () => cancelBooking(btn.getAttribute('data-cancel'))));
+        container.querySelectorAll('[data-approve]').forEach((btn) => btn.addEventListener('click', () => approveBooking(btn.getAttribute('data-approve'))));
+        container.querySelectorAll('[data-edit]').forEach((btn) => btn.addEventListener('click', () => openEditModal(btn.getAttribute('data-edit'))));
+      });
+    }
+
+    // --- Bulk Action & Row Actions ---
+    function handleSelectAllChange(checked) {
+      document.querySelectorAll('.row-cb').forEach((cb) => { cb.checked = checked; });
+      if ($('select-all-cb')) $('select-all-cb').checked = checked;
+      if ($('select-all-cb-mobile')) $('select-all-cb-mobile').checked = checked;
+    }
+    $('select-all-cb') && $('select-all-cb').addEventListener('change', () => handleSelectAllChange($('select-all-cb').checked));
+    $('select-all-cb-mobile') && $('select-all-cb-mobile').addEventListener('change', () => handleSelectAllChange($('select-all-cb-mobile').checked));
+
+    $('remind-pending').addEventListener('click', async () => {
+      const checkedEls = Array.from(document.querySelectorAll('.row-cb:checked'));
+      let targetRows = checkedEls.length ? allRows.filter(r => checkedEls.some(el => el.value === r.id)) : allRows.filter(r => r.status === 'pending');
+      
+      if (!targetRows.length) return alert('No pending bookings selected.');
+      if (!confirm(`Send payment reminders to ${targetRows.length} guest(s)?`)) return;
+
+      const btn = $('remind-pending');
+      btn.textContent = 'Sending...'; btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/bookings/remind-pending`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+          body: JSON.stringify({ booking_ids: targetRows.map(r => r.id) }),
+        });
+        if (res.status === 401) { showGate(); return; }
+        if (!res.ok) throw new Error('Failed to send');
+        alert('Reminders queued successfully.');
+        render(); // resets checkboxes
+      } catch (e) {
+        alert('Could not reach server.');
+      } finally {
+        btn.textContent = 'Remind Pending'; btn.disabled = false;
+      }
+    });
+
+    async function approveBooking(id) {
+      if (!confirm('Approve payment and generate Bib Code?')) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/bookings/${id}/approve`, { method: 'POST', headers: { 'X-Admin-Key': adminKey } });
+        if (res.ok) load(); else alert('Failed to approve.');
+      } catch (e) { alert('Network error.'); }
+    }
+
+    async function cancelBooking(id) {
+      if (!confirm('Cancel this entry? This frees up the slot.')) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/bookings/${id}/cancel`, { method: 'POST', headers: { 'X-Admin-Key': adminKey } });
+        if (res.ok) load(); else alert('Failed to cancel.');
+      } catch (e) { alert('Network error.'); }
+    }
+
+    // --- Exports ---
+    function exportExcel() {
+      if (!window.XLSX) return alert('Excel lib loading...');
+      const rows = exportRows();
+      if (!rows.length) return alert('No data.');
+      
+      const manifest = buildManifest(rows);
+      const ws1 = XLSX.utils.aoa_to_sheet([
+        ['RUNNER MANIFEST'], ['Event', EVENT.name], ['Date', EVENT.date], ['Boarding', EVENT.boarding], [],
+        ['#', 'Runner Name', 'Lead Booker', 'Package', 'Shirt', 'Team/Club', 'Bib Code', 'Status', 'Phone', 'Emergency Contact']
+      ].concat(manifest.map((m, i) => [i + 1, m.runner_name, m.lead, m.package, m.shirt, m.team, m.bib, m.status, m.phone, m.emergency])));
+      
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws1, 'Runner Manifest');
+      XLSX.writeFile(wb, `ProjectStride_${currentFilter}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    function exportPDF() {
+      if (!window.jspdf) return alert('PDF lib loading...');
+      const rows = exportRows();
+      if (!rows.length) return alert('No data.');
+      
+      const doc = new jspdf.jsPDF('l', 'pt', 'a4'); // Landscape for race data
+      doc.setFontSize(16); doc.text('RUNNER MANIFEST', 40, 50);
+      doc.setFontSize(10); doc.text(`${EVENT.name} · ${EVENT.date}`, 40, 70);
+      
+      const manifest = buildManifest(rows);
+      const body = manifest.map((m, i) => [i+1, m.runner_name, m.package, m.shirt, m.team, m.bib, m.status, m.emergency]);
+      
+      doc.autoTable({
+        startY: 90,
+        head: [['#', 'Runner Name', 'Package', 'Shirt', 'Team/Club', 'Bib', 'Status', 'Emergency Contact']],
+        body: body,
+        theme: 'grid',
+        headStyles: { fillColor: [20, 34, 67] }
+      });
+      doc.save(`ProjectStride_${currentFilter}.pdf`);
+    }
+
+    $('export-xlsx').addEventListener('click', exportExcel);
+    $('export-pdf').addEventListener('click', exportPDF);
+
+    // --- Edit Modal ---
+    let editingId = null;
+
+    function renderGuestNameInputs(count, existingNames) {
+      const wrap = $('edit-guest-names');
+      const base = existingNames || Array.from(wrap.querySelectorAll('input')).map(i => i.value);
+      wrap.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const input = document.createElement('input');
+        input.type = 'text'; input.placeholder = `Runner ${i + 1} Name`; input.value = base[i] || '';
+        input.className = 'w-full bg-stride-ink border border-white/10 rounded-xl focus:border-stride-volt text-stride-chalk text-sm px-4 py-2.5 outline-none mb-2';
+        wrap.appendChild(input);
+      }
+    }
+
+    function updateEditTotal() {
+      $('edit-total').textContent = peso(computeTotal($('edit-package').value, Number($('edit-guests').value) || 1));
+    }
+
+    function openEditModal(id) {
+      const r = allRows.find((row) => row.id === id);
+      if (!r) return;
+      editingId = id;
+
+      $('edit-error').classList.add('hidden');
+      $('edit-subtitle').textContent = `Bib: ${r.bib_code || 'Pending'} · Status: ${r.status}`;
+      
+      $('edit-full_name').value = r.full_name || '';
+      $('edit-email').value = r.email || '';
+      $('edit-phone').value = r.phone || '';
+      $('edit-emergency').value = r.emergency_contact || '';
+      $('edit-team').value = r.team_name || '';
+      $('edit-package').value = r.package;
+      $('edit-shirt').value = r.shirt_size || 'M';
+      $('edit-guests').value = r.guests || 1;
+
+      renderGuestNameInputs(r.guests, Array.isArray(r.guest_names) ? r.guest_names : []);
+      updateEditTotal();
+      $('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() { $('edit-modal').classList.add('hidden'); editingId = null; }
+    
+    $('edit-close').addEventListener('click', closeEditModal);
+    $('edit-cancel-btn').addEventListener('click', closeEditModal);
+    $('edit-package').addEventListener('change', updateEditTotal);
+    $('edit-guests').addEventListener('input', () => {
+      renderGuestNameInputs(Number($('edit-guests').value) || 1);
+      updateEditTotal();
+    });
+
+    $('edit-save').addEventListener('click', async () => {
+      if (!editingId) return;
+      const guests = Number($('edit-guests').value) || 1;
+      const names = Array.from($('edit-guest-names').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+      
+      if (names.length !== guests) return alert(`Please provide ${guests} names.`);
+
+      const btn = $('edit-save'); btn.textContent = 'Saving...'; btn.disabled = true;
+      try {
+        const body = {
+          full_name: $('edit-full_name').value.trim(),
+          email: $('edit-email').value.trim(),
+          phone: $('edit-phone').value.trim(),
+          emergency_contact: $('edit-emergency').value.trim(),
+          team_name: $('edit-team').value.trim() || null,
+          package: $('edit-package').value,
+          shirt_size: $('edit-shirt').value,
+          guests: guests,
+          guest_names: names
+        };
+
+        const res = await fetch(`${API_BASE}/api/bookings/${editingId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+          body: JSON.stringify(body),
+        });
+        if (res.status === 401) { closeEditModal(); showGate(); return; }
+        if (!res.ok) throw new Error('Save failed');
+        closeEditModal(); load();
+      } catch (e) {
+        $('edit-error').textContent = 'Error saving.'; $('edit-error').classList.remove('hidden');
+      } finally {
+        btn.textContent = 'Save Updates'; btn.disabled = false;
+      }
+    });
+
+    // Boot
+    (async function boot() {
+      if (adminKey && await tryKey(adminKey).catch(() => false)) { showDash(); load(); } else { showGate(); }
+    })();
+  })();
+  </script>
+</body>
+</html>
