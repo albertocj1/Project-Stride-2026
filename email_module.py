@@ -2,7 +2,7 @@
 #  QR + HTML EMAIL — Project Stride 2026 Boarding Pass & Reminder System
 #  Requires: qrcode, pillow
 # ============================================================================
-import os, io, json, base64
+import os, io, json, base64, traceback
 from email.message import EmailMessage
 from email.utils import make_msgid
 
@@ -37,6 +37,13 @@ def get_gmail_service():
         raise Exception("Gmail credentials are not valid. Ensure GMAIL_TOKEN_JSON env var or token.json is present.")
 
     return build('gmail', 'v1', credentials=creds)
+
+def _fmt_amount(value) -> str:
+    """Format an amount like 1,500 whether it arrives as int, float, str or None."""
+    try:
+        return f"{float(str(value).replace(',', '')):,.0f}"
+    except (TypeError, ValueError):
+        return str(value or 0)
 
 def _make_qr_png(data: str) -> bytes:
     """Branded PNG QR encoding the bib_code."""
@@ -244,6 +251,7 @@ def send_approval_email(to_email, guest_name, bib_code, package_name, shirt_size
         print(f"Successfully sent confirmation email to {to_email}")
     except Exception as e:
         print(f"ERROR sending email to {to_email}: {str(e)}")
+        traceback.print_exc()
 
 
 def send_pending_reminder_email(to_email, guest_name, package_name, guests, total_amount):
@@ -321,7 +329,7 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
             <tr><td align="center" style="padding:20px;">
               <div class="gmail-blend-screen"><div class="gmail-blend-difference">
                 <div class="text-muted" style="font-family:'Courier New', monospace; font-size:10px; letter-spacing:2px; color:#7A8C99; text-transform:uppercase;">Amount Due</div>
-                <div class="text-amount" style="font-family:Arial, sans-serif; font-size:28px; color:#FCD116; font-weight:bold; margin-top:4px;">₱{total_amount:,}</div>
+                <div class="text-amount" style="font-family:Arial, sans-serif; font-size:28px; color:#FCD116; font-weight:bold; margin-top:4px;">₱{_fmt_amount(total_amount)}</div>
               </div></div>
             </td></tr>
           </table>
@@ -352,7 +360,7 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
         text_body = (
             f"Hi {guest_name},\n\n"
             f"We noticed you requested a registration for '{package_name}' ({guests} {guest_word}) but haven't uploaded your payment receipt yet.\n\n"
-            f"Amount Due: ₱{total_amount:,}\n\n"
+            f"Amount Due: ₱{_fmt_amount(total_amount)}\n\n"
             f"Since bibs are strictly capped, unpaid reservations are released automatically. To secure your slot, please transfer your payment and upload your receipt on our website.\n\n"
             f"Project Stride"
         )
@@ -373,3 +381,4 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
         print(f"Successfully sent pending reminder email to {to_email}")
     except Exception as e:
         print(f"ERROR sending reminder email to {to_email}: {str(e)}")
+        traceback.print_exc()
