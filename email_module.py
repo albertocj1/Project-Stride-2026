@@ -22,12 +22,48 @@ EVENT_DATE_SHORT = "Jan 23, 2027 &middot; 5:00 AM"
 LOGO_PATH = os.environ.get("LOGO_PATH", "442497274_419117694308411_2751438522990521029_n.jpg")
 LOGO_URL = None # Leave None to embed the image directly into the email
 
-# Shared styles for every email. The design is LIGHT on purpose: phone mail apps
-# (Gmail iOS especially) convert light emails to dark mode cleanly, while dark
-# emails get their text colours scrambled. Kept in its own block so Gmail, which
-# ignores :root, doesn't affect anything else.
+# Shared styles for every email. The design is dark by default, so the goal is to
+# stop phone mail apps from "helpfully" inverting it in dark mode:
+#  - background-image gradients (inline): Gmail won't invert backgrounds set this way
+#  - gmail-blend-* wrappers: undo Gmail iOS/Android text-colour inversion
+#  - prefers-color-scheme: pin colours in Apple Mail / iOS Mail
+#  - [data-ogsc]/[data-ogsb]: pin colours in Outlook's dark mode
+# Each lives in its OWN <style> block: Gmail throws away an entire block if it contains
+# anything it doesn't support (attribute selectors, :root), which would take the
+# Gmail fixes down with it.
 EMAIL_STYLE = """<style>
-  :root { color-scheme: light dark; supported-color-schemes: light dark; }
+  u + .body .gmail-blend-screen     { background:#000000; mix-blend-mode:screen; }
+  u + .body .gmail-blend-difference { background:#000000; mix-blend-mode:difference; }
+  u + .body .text-gold   { color:#FCD116 !important; border-color:#FCD116 !important; }
+  u + .body .text-cream  { color:#FFFFFF !important; }
+  u + .body .text-muted  { color:#7A8C99 !important; }
+  u + .body .text-amount { color:#FCD116 !important; }
+</style>
+<style>
+  :root { color-scheme: dark; supported-color-schemes: dark; }
+  @media (prefers-color-scheme: dark) {
+    .body-bg       { background-color:#152243 !important; }
+    .card-edge     { background-color:#C1121F !important; }
+    .card-bg       { background-color:#0F2043 !important; }
+    .panel-bg, .amount-box-bg { background-color:#152243 !important; }
+    .qr-card-bg    { background-color:#FFFFFF !important; }
+    .notice-edge   { background-color:#1A3668 !important; }
+    .notice-bg     { background-color:#0F2043 !important; }
+    .text-cream    { color:#FFFFFF !important; }
+    .text-muted    { color:#7A8C99 !important; }
+    .text-gold, .text-amount { color:#FCD116 !important; }
+  }
+</style>
+<style>
+  [data-ogsb] .body-bg   { background-color:#152243 !important; }
+  [data-ogsb] .card-edge { background-color:#C1121F !important; }
+  [data-ogsb] .card-bg, [data-ogsb] .notice-bg { background-color:#0F2043 !important; }
+  [data-ogsb] .panel-bg, [data-ogsb] .amount-box-bg { background-color:#152243 !important; }
+  [data-ogsb] .notice-edge { background-color:#1A3668 !important; }
+  [data-ogsb] .qr-card-bg  { background-color:#FFFFFF !important; }
+  [data-ogsc] .text-cream { color:#FFFFFF !important; }
+  [data-ogsc] .text-muted { color:#7A8C99 !important; }
+  [data-ogsc] .text-gold, [data-ogsc] .text-amount { color:#FCD116 !important; }
 </style>"""
 
 def get_gmail_service():
@@ -79,13 +115,13 @@ def _build_approval_html(guest_name, bib_code, package_name, shirt_size, guests,
         wordmark_html = f"""
       <img src="cid:{logo_cid}" alt="Project Stride" width="160" style="display:block; width:160px; max-width:60%; height:auto; border:0; margin:0 auto; border-radius: 50%;">
       <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-        <div class="text-muted" style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#5B6B7A; text-transform:uppercase; margin-top:10px;">LIMA ESTATE &middot; MALVAR</div>
+        <div class="text-muted" style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#7A8C99; text-transform:uppercase; margin-top:10px;">LIMA ESTATE &middot; MALVAR</div>
       </div></div>"""
     else:
         wordmark_html = """
       <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-        <span class="text-gold" style="font-family:'Courier New', monospace; font-size:16px; letter-spacing:4px; color:#C1121F; text-transform:uppercase; font-weight:bold;">PROJECT STRIDE</span>
-        <div class="text-muted" style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#5B6B7A; text-transform:uppercase; margin-top:6px;">LIMA ESTATE &middot; MALVAR</div>
+        <span class="text-gold" style="font-family:'Courier New', monospace; font-size:16px; letter-spacing:4px; color:#FCD116; text-transform:uppercase; font-weight:bold;">PROJECT STRIDE</span>
+        <div class="text-muted" style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#7A8C99; text-transform:uppercase; margin-top:6px;">LIMA ESTATE &middot; MALVAR</div>
       </div></div>"""
 
     html = """\
@@ -94,73 +130,73 @@ def _build_approval_html(guest_name, bib_code, package_name, shirt_size, guests,
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="light dark">
-<meta name="supported-color-schemes" content="light dark">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 __STYLE__
 </head>
-<body class="body body-bg" style="margin:0; padding:0; background-color:#F1F4F8; font-family:Arial, Helvetica, sans-serif;">
+<body class="body body-bg" style="margin:0; padding:0; background-color:#152243; font-family:Arial, Helvetica, sans-serif;">
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); padding:32px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#152243; background-image:linear-gradient(#152243,#152243); padding:32px 12px;">
 <tr><td align="center">
   <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%;">
     <tr><td align="center" style="padding-bottom:28px;">__WORDMARK__</td></tr>
     <tr><td class="card-edge" style="background-color:#C1121F; background-image:linear-gradient(#C1121F,#C1121F); border-radius:24px; padding:2px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border-radius:22px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#0F2043; background-image:linear-gradient(#0F2043,#0F2043); border-radius:22px;">
         <tr><td align="center" style="padding:36px 32px 8px 32px;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-            <div class="text-gold" style="width:52px; height:52px; line-height:52px; margin:0 auto 18px auto; border:2px solid #C1121F; border-radius:50%; color:#C1121F; font-size:22px; text-align:center;">&#10003;</div>
-            <div class="text-cream" style="font-family:Arial, sans-serif; font-size:28px; font-weight:bold; color:#152243; letter-spacing:-0.5px;">You're on the start list</div>
-            <div class="text-muted" style="font-size:13px; color:#5B6B7A; line-height:1.6; padding:14px 8px 0 8px;">
+            <div class="text-gold" style="width:52px; height:52px; line-height:52px; margin:0 auto 18px auto; border:2px solid #FCD116; border-radius:50%; color:#FCD116; font-size:22px; text-align:center;">&#10003;</div>
+            <div class="text-cream" style="font-family:Arial, sans-serif; font-size:28px; font-weight:bold; color:#FFFFFF; letter-spacing:-0.5px;">You're on the start list</div>
+            <div class="text-muted" style="font-size:13px; color:#7A8C99; line-height:1.6; padding:14px 8px 0 8px;">
               Hi __GUEST_NAME__, your payment is verified and your race registration is confirmed. Present the QR code below at Lima Estate to claim your race kit.
             </div>
           </div></div>
         </td></tr>
         <tr><td align="center" style="padding:28px 32px 8px 32px;">
-          <table role="presentation" cellpadding="0" cellspacing="0" class="qr-card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border:1px solid #E2E7EF; border-radius:18px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" class="qr-card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border-radius:18px;">
             <tr><td align="center" style="padding:16px;">
               <img src="cid:__QR_CID__" alt="Kit Pickup QR code" width="180" height="180" style="display:block; width:180px; height:180px; border:0;">
             </td></tr>
           </table>
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-            <div class="text-muted" style="font-family:'Courier New', monospace; font-size:11px; letter-spacing:2px; color:#5B6B7A; text-transform:uppercase; padding-top:16px;">Scan at Kit Pickup</div>
+            <div class="text-muted" style="font-family:'Courier New', monospace; font-size:11px; letter-spacing:2px; color:#7A8C99; text-transform:uppercase; padding-top:16px;">Scan at Kit Pickup</div>
           </div></div>
         </td></tr>
         <tr><td align="center" style="padding:8px 32px 24px 32px;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-            <div class="text-gold" style="font-family:'Courier New', monospace; font-size:24px; letter-spacing:3px; color:#C1121F; font-weight:bold;">__BIB_CODE__</div>
+            <div class="text-gold" style="font-family:'Courier New', monospace; font-size:24px; letter-spacing:3px; color:#FCD116; font-weight:bold;">__BIB_CODE__</div>
           </div></div>
         </td></tr>
         <tr><td style="padding:0 32px;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-            <div style="border-top:2px dashed #E2E7EF; font-size:0; line-height:0;">&nbsp;</div>
+            <div style="border-top:2px dashed #1A3668; font-size:0; line-height:0;">&nbsp;</div>
           </div></div>
         </td></tr>
         <tr><td style="padding:24px 32px 8px 32px;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:'Courier New', monospace; font-size:12px;">
-              <tr><td class="text-muted" style="color:#5B6B7A; text-transform:uppercase; letter-spacing:1px; padding:8px 0;">Lead Runner</td>
-                  <td align="right" class="text-cream" style="color:#152243; font-weight:bold; padding:8px 0;">__GUEST_NAME__</td></tr>
-              <tr><td class="text-muted" style="color:#5B6B7A; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #E2E7EF;">Category</td>
-                  <td align="right" class="text-cream" style="color:#152243; padding:8px 0; border-top:1px solid #E2E7EF;">__PACKAGE__</td></tr>
-              <tr><td class="text-muted" style="color:#5B6B7A; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #E2E7EF;">Runners</td>
-                  <td align="right" class="text-cream" style="color:#152243; padding:8px 0; border-top:1px solid #E2E7EF;">__GUESTS__ __GUEST_WORD__</td></tr>
-              <tr><td class="text-muted" style="color:#5B6B7A; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #E2E7EF;">Shirt Size</td>
-                  <td align="right" class="text-cream" style="color:#152243; padding:8px 0; border-top:1px solid #E2E7EF;">__SHIRT_SIZE__</td></tr>
-              <tr><td class="text-muted" style="color:#5B6B7A; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #E2E7EF;">Date</td>
-                  <td align="right" class="text-cream" style="color:#152243; padding:8px 0; border-top:1px solid #E2E7EF;">__DATE_SHORT__</td></tr>
-              <tr><td class="text-muted" style="color:#5B6B7A; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #E2E7EF;">Venue</td>
-                  <td align="right" class="text-cream" style="color:#152243; padding:8px 0; border-top:1px solid #E2E7EF;">Lima Estate, Malvar</td></tr>
+              <tr><td class="text-muted" style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0;">Lead Runner</td>
+                  <td align="right" class="text-cream" style="color:#FFFFFF; font-weight:bold; padding:8px 0;">__GUEST_NAME__</td></tr>
+              <tr><td class="text-muted" style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #1A3668;">Category</td>
+                  <td align="right" class="text-cream" style="color:#FFFFFF; padding:8px 0; border-top:1px solid #1A3668;">__PACKAGE__</td></tr>
+              <tr><td class="text-muted" style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #1A3668;">Runners</td>
+                  <td align="right" class="text-cream" style="color:#FFFFFF; padding:8px 0; border-top:1px solid #1A3668;">__GUESTS__ __GUEST_WORD__</td></tr>
+              <tr><td class="text-muted" style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #1A3668;">Shirt Size</td>
+                  <td align="right" class="text-cream" style="color:#FFFFFF; padding:8px 0; border-top:1px solid #1A3668;">__SHIRT_SIZE__</td></tr>
+              <tr><td class="text-muted" style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #1A3668;">Date</td>
+                  <td align="right" class="text-cream" style="color:#FFFFFF; padding:8px 0; border-top:1px solid #1A3668;">__DATE_SHORT__</td></tr>
+              <tr><td class="text-muted" style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #1A3668;">Venue</td>
+                  <td align="right" class="text-cream" style="color:#FFFFFF; padding:8px 0; border-top:1px solid #1A3668;">Lima Estate, Malvar</td></tr>
             </table>
           </div></div>
         </td></tr>
         <tr><td style="padding:16px 32px 36px 32px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-edge" style="background-color:#F2D45C; background-image:linear-gradient(#F2D45C,#F2D45C); border-radius:14px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-edge" style="background-color:#1A3668; background-image:linear-gradient(#1A3668,#1A3668); border-radius:14px;">
             <tr><td style="padding:1px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-bg" style="background-color:#FFF9E0; background-image:linear-gradient(#FFF9E0,#FFF9E0); border-radius:13px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-bg" style="background-color:#0F2043; background-image:linear-gradient(#0F2043,#0F2043); border-radius:13px;">
                 <tr><td style="padding:16px;">
                   <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-                    <div class="text-muted" style="font-size:12px; color:#5B6B7A; line-height:1.6;">
-                      <span class="text-gold" style="color:#C1121F; font-weight:bold;">__DATE_LONG__.</span> Kit pickup opens at 4:00 AM. Gun start varies per category. Registrations are final and non-transferable.
+                    <div class="text-muted" style="font-size:12px; color:#7A8C99; line-height:1.6;">
+                      <span class="text-gold" style="color:#FCD116; font-weight:bold;">__DATE_LONG__.</span> Kit pickup opens at 4:00 AM. Gun start varies per category. Registrations are final and non-transferable.
                     </div>
                   </div></div>
                 </td></tr>
@@ -172,7 +208,7 @@ __STYLE__
     </td></tr>
     <tr><td align="center" style="padding:28px 20px 8px 20px;">
       <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-        <div class="text-muted" style="font-size:11px; color:#5B6B7A; line-height:1.7;">
+        <div class="text-muted" style="font-size:11px; color:#7A8C99; line-height:1.7;">
           Project Stride &middot; Lima Estate, Malvar, Batangas<br>
           Questions? Reply to this email.
         </div>
@@ -265,13 +301,13 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
             wordmark_html = f"""
           <img src="cid:{logo_cid}" alt="Project Stride" width="160" style="display:block; width:160px; max-width:60%; height:auto; border:0; margin:0 auto; border-radius: 50%;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-            <div class="text-muted" style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#5B6B7A; text-transform:uppercase; margin-top:10px;">LIMA ESTATE &middot; MALVAR</div>
+            <div class="text-muted" style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#7A8C99; text-transform:uppercase; margin-top:10px;">LIMA ESTATE &middot; MALVAR</div>
           </div></div>"""
         else:
             wordmark_html = """
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-            <span class="text-gold" style="font-family:'Courier New', monospace; font-size:16px; letter-spacing:4px; color:#C1121F; text-transform:uppercase; font-weight:bold;">PROJECT STRIDE</span>
-            <div class="text-muted" style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#5B6B7A; text-transform:uppercase; margin-top:6px;">LIMA ESTATE &middot; MALVAR</div>
+            <span class="text-gold" style="font-family:'Courier New', monospace; font-size:16px; letter-spacing:4px; color:#FCD116; text-transform:uppercase; font-weight:bold;">PROJECT STRIDE</span>
+            <div class="text-muted" style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#7A8C99; text-transform:uppercase; margin-top:6px;">LIMA ESTATE &middot; MALVAR</div>
           </div></div>"""
 
         html_body = f"""\
@@ -280,39 +316,39 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="light dark">
-<meta name="supported-color-schemes" content="light dark">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 {EMAIL_STYLE}
 </head>
-<body class="body body-bg" style="margin:0; padding:0; background-color:#F1F4F8; font-family:Arial, Helvetica, sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); padding:32px 12px;">
+<body class="body body-bg" style="margin:0; padding:0; background-color:#152243; font-family:Arial, Helvetica, sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#152243; background-image:linear-gradient(#152243,#152243); padding:32px 12px;">
 <tr><td align="center">
   <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%;">
     <tr><td align="center" style="padding-bottom:28px;">{wordmark_html}</td></tr>
     <tr><td class="card-edge" style="background-color:#C1121F; background-image:linear-gradient(#C1121F,#C1121F); border-radius:24px; padding:2px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border-radius:22px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#0F2043; background-image:linear-gradient(#0F2043,#0F2043); border-radius:22px;">
         <tr><td align="center" style="padding:36px 32px 24px 32px;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-            <div class="text-gold" style="font-family:'Courier New', monospace; font-size:11px; letter-spacing:3px; color:#C1121F; text-transform:uppercase; margin-bottom:12px;">Payment Reminder</div>
-            <div class="text-cream" style="font-family:Arial, sans-serif; font-weight:bold; font-size:26px; color:#152243; letter-spacing:-0.5px;">Complete Your Registration</div>
-            <div class="text-muted" style="font-size:13px; color:#5B6B7A; line-height:1.6; padding:16px 8px 0 8px;">
+            <div class="text-gold" style="font-family:'Courier New', monospace; font-size:11px; letter-spacing:3px; color:#FCD116; text-transform:uppercase; margin-bottom:12px;">Payment Reminder</div>
+            <div class="text-cream" style="font-family:Arial, sans-serif; font-weight:bold; font-size:26px; color:#FFFFFF; letter-spacing:-0.5px;">Complete Your Registration</div>
+            <div class="text-muted" style="font-size:13px; color:#7A8C99; line-height:1.6; padding:16px 8px 0 8px;">
               Hi {guest_name}, we noticed you requested a spot for <strong>{package_name}</strong> ({guests} {guest_word}) but haven't uploaded your payment receipt yet. Since bibs are strictly capped, unpaid holds are released automatically.
             </div>
           </div></div>
         </td></tr>
         <tr><td style="padding:0 32px 28px 32px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="amount-box-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); border:1px solid #E2E7EF; border-radius:16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="amount-box-bg" style="background-color:#152243; background-image:linear-gradient(#152243,#152243); border:1px solid #1A3668; border-radius:16px;">
             <tr><td align="center" style="padding:20px;">
               <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-                <div class="text-muted" style="font-family:'Courier New', monospace; font-size:10px; letter-spacing:2px; color:#5B6B7A; text-transform:uppercase;">Amount Due</div>
-                <div class="text-amount" style="font-family:Arial, sans-serif; font-size:28px; color:#C1121F; font-weight:bold; margin-top:4px;">₱{_fmt_amount(total_amount)}</div>
+                <div class="text-muted" style="font-family:'Courier New', monospace; font-size:10px; letter-spacing:2px; color:#7A8C99; text-transform:uppercase;">Amount Due</div>
+                <div class="text-amount" style="font-family:Arial, sans-serif; font-size:28px; color:#FCD116; font-weight:bold; margin-top:4px;">₱{_fmt_amount(total_amount)}</div>
               </div></div>
             </td></tr>
           </table>
         </td></tr>
         <tr><td align="center" style="padding:0 32px 36px 32px;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-            <div class="text-muted" style="font-size:12px; color:#5B6B7A; line-height:1.6;">
+            <div class="text-muted" style="font-size:12px; color:#7A8C99; line-height:1.6;">
               To finalize your entry, please complete your transfer via GCash or Bank Transfer and upload your screenshot on our website.
             </div>
           </div></div>
@@ -321,7 +357,7 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
     </td></tr>
     <tr><td align="center" style="padding:28px 20px 8px 20px;">
       <div class="gmail-blend-screen"><div class="gmail-blend-difference">
-        <div class="text-muted" style="font-size:11px; color:#5B6B7A; line-height:1.7;">
+        <div class="text-muted" style="font-size:11px; color:#7A8C99; line-height:1.7;">
           Project Stride &middot; Lima Estate, Malvar, Batangas<br>
           Questions? Reply directly to this email.
         </div>
@@ -375,26 +411,26 @@ def send_reschedule_email(to_email, guest_name, bib_code=None, package_name=None
         bib = escape(str(bib_code or "—"))
         pkg = escape(str(package_name or "—"))
 
-        # blend() wrappers are inert now that the design is light (the dark-mode
-        # blend CSS was removed); kept so the markup stays simple to edit.
+        # Every text block sits inside the gmail-blend wrappers, and every coloured
+        # surface uses a class + background-image so phone dark modes leave it alone.
         def blend(inner):
             return f'<div class="gmail-blend-screen"><div class="gmail-blend-difference">{inner}</div></div>'
 
         if logo_cid:
             wordmark_html = f"""
           <img src="cid:{logo_cid}" alt="Project Stride" width="140" style="display:block; width:140px; max-width:60%; height:auto; border:0; margin:0 auto; border-radius:50%;">
-          {blend('<div class="text-muted" style="font-family:Courier New, monospace; font-size:9px; letter-spacing:3px; color:#5B6B7A; text-transform:uppercase; margin-top:10px;">LIMA ESTATE &middot; MALVAR</div>')}"""
+          {blend('<div class="text-muted" style="font-family:Courier New, monospace; font-size:9px; letter-spacing:3px; color:#7A8C99; text-transform:uppercase; margin-top:10px;">LIMA ESTATE &middot; MALVAR</div>')}"""
         else:
             wordmark_html = blend(
-                '<span class="text-gold" style="font-family:Courier New, monospace; font-size:16px; letter-spacing:4px; color:#C1121F; text-transform:uppercase; font-weight:bold;">PROJECT STRIDE</span>'
-                '<div class="text-muted" style="font-family:Courier New, monospace; font-size:9px; letter-spacing:3px; color:#5B6B7A; text-transform:uppercase; margin-top:6px;">LIMA ESTATE &middot; MALVAR</div>')
+                '<span class="text-gold" style="font-family:Courier New, monospace; font-size:16px; letter-spacing:4px; color:#FCD116; text-transform:uppercase; font-weight:bold;">PROJECT STRIDE</span>'
+                '<div class="text-muted" style="font-family:Courier New, monospace; font-size:9px; letter-spacing:3px; color:#7A8C99; text-transform:uppercase; margin-top:6px;">LIMA ESTATE &middot; MALVAR</div>')
 
         def perk(title, body):
             return f"""
-            <tr><td style="padding:10px 0; border-top:1px solid #E2E7EF;">
+            <tr><td style="padding:10px 0; border-top:1px solid #1A3668;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-                <td width="30" valign="top">{blend('<div class="text-gold" style="color:#C1121F; font-size:16px; font-weight:bold;">&#10003;</div>')}</td>
-                <td>{blend(f'<div class="text-cream" style="font-size:13px; line-height:1.5; color:#152243; font-weight:bold;">{title}</div><div class="text-muted" style="color:#5B6B7A; font-size:12px; line-height:1.5;">{body}</div>')}</td>
+                <td width="30" valign="top">{blend('<div class="text-gold" style="color:#FCD116; font-size:16px; font-weight:bold;">&#10003;</div>')}</td>
+                <td>{blend(f'<div class="text-cream" style="font-size:13px; line-height:1.5; color:#FFFFFF; font-weight:bold;">{title}</div><div class="text-muted" style="color:#7A8C99; font-size:12px; line-height:1.5;">{body}</div>')}</td>
               </tr></table>
             </td></tr>"""
 
@@ -404,9 +440,9 @@ def send_reschedule_email(to_email, guest_name, bib_code=None, package_name=None
             + perk("Automatic registration transfer", "Your existing registration moves to January 23, 2027 at no additional cost.")
         )
 
-        def detail_row(label, value, value_class="text-cream", value_color="#152243", first=False):
-            border = "" if first else " border-top:1px solid #E2E7EF;"
-            return (f'<tr><td class="text-muted" style="color:#5B6B7A; text-transform:uppercase; letter-spacing:1px; padding:8px 0;{border}">{label}</td>'
+        def detail_row(label, value, value_class="text-cream", value_color="#FFFFFF", first=False):
+            border = "" if first else " border-top:1px solid #1A3668;"
+            return (f'<tr><td class="text-muted" style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0;{border}">{label}</td>'
                     f'<td align="right" class="{value_class}" style="color:{value_color}; font-weight:bold; padding:8px 0;{border}">{value}</td></tr>')
 
         html_body = f"""\
@@ -415,63 +451,63 @@ def send_reschedule_email(to_email, guest_name, bib_code=None, package_name=None
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="light dark">
-<meta name="supported-color-schemes" content="light dark">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 {EMAIL_STYLE}
 </head>
-<body class="body body-bg" style="margin:0; padding:0; background-color:#F1F4F8; font-family:Arial, Helvetica, sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); padding:32px 12px;">
+<body class="body body-bg" style="margin:0; padding:0; background-color:#152243; font-family:Arial, Helvetica, sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#152243; background-image:linear-gradient(#152243,#152243); padding:32px 12px;">
 <tr><td align="center">
   <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%;">
     <tr><td align="center" style="padding-bottom:28px;">{wordmark_html}</td></tr>
     <tr><td class="card-edge" style="background-color:#C1121F; background-image:linear-gradient(#C1121F,#C1121F); border-radius:24px; padding:2px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border-radius:22px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#0F2043; background-image:linear-gradient(#0F2043,#0F2043); border-radius:22px;">
 
         <tr><td align="center" style="padding:36px 28px 8px 28px;">
-          {blend(f'''<div class="text-gold" style="font-family:Courier New, monospace; font-size:11px; letter-spacing:3px; color:#C1121F; text-transform:uppercase; margin-bottom:12px;">Important Event Update</div>
-          <div class="text-cream" style="font-size:26px; font-weight:bold; color:#152243; letter-spacing:-0.5px; line-height:1.2;">We&rsquo;ve Moved the Date</div>
-          <div class="text-muted" style="font-size:13px; color:#5B6B7A; line-height:1.6; padding:14px 4px 0 4px;">Dear {name}, thank you for registering for Project Stride 2026: Fun Run &amp; Duathlon.</div>''')}
+          {blend(f'''<div class="text-gold" style="font-family:Courier New, monospace; font-size:11px; letter-spacing:3px; color:#FCD116; text-transform:uppercase; margin-bottom:12px;">Important Event Update</div>
+          <div class="text-cream" style="font-size:26px; font-weight:bold; color:#FFFFFF; letter-spacing:-0.5px; line-height:1.2;">We&rsquo;ve Moved the Date</div>
+          <div class="text-muted" style="font-size:13px; color:#7A8C99; line-height:1.6; padding:14px 4px 0 4px;">Dear {name}, thank you for registering for Project Stride 2026: Fun Run &amp; Duathlon.</div>''')}
         </td></tr>
 
         <tr><td style="padding:24px 28px 8px 28px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="panel-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); border-radius:16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="panel-bg" style="background-color:#152243; background-image:linear-gradient(#152243,#152243); border-radius:16px;">
             <tr>
               <td align="center" width="50%" style="padding:18px 6px;">
-                {blend('''<div class="text-muted" style="font-family:Courier New, monospace; font-size:10px; letter-spacing:2px; color:#5B6B7A; text-transform:uppercase;">Original</div>
-                <div class="text-muted" style="font-size:15px; color:#5B6B7A; text-decoration:line-through; margin-top:6px;">Nov 28, 2026</div>''')}
+                {blend('''<div class="text-muted" style="font-family:Courier New, monospace; font-size:10px; letter-spacing:2px; color:#7A8C99; text-transform:uppercase;">Original</div>
+                <div class="text-muted" style="font-size:15px; color:#7A8C99; text-decoration:line-through; margin-top:6px;">Nov 28, 2026</div>''')}
               </td>
-              <td align="center" width="50%" style="padding:18px 6px; border-left:1px solid #E2E7EF;">
-                {blend('''<div class="text-gold" style="font-family:Courier New, monospace; font-size:10px; letter-spacing:2px; color:#C1121F; text-transform:uppercase;">New Date</div>
-                <div class="text-gold" style="font-size:20px; color:#C1121F; font-weight:bold; margin-top:6px;">Jan 23, 2027</div>''')}
+              <td align="center" width="50%" style="padding:18px 6px; border-left:1px solid #1A3668;">
+                {blend('''<div class="text-gold" style="font-family:Courier New, monospace; font-size:10px; letter-spacing:2px; color:#FCD116; text-transform:uppercase;">New Date</div>
+                <div class="text-gold" style="font-size:20px; color:#FCD116; font-weight:bold; margin-top:6px;">Jan 23, 2027</div>''')}
               </td>
             </tr>
           </table>
         </td></tr>
 
         <tr><td style="padding:16px 28px 0 28px;">
-          {blend('<div class="text-muted" style="font-size:13px; color:#5B6B7A; line-height:1.7;">The event has been rescheduled to <span class="text-cream" style="color:#152243; font-weight:bold;">January 23, 2027</span>. The adjustment allows us to accommodate an expanded race course in conjunction with the Lima Outlets&rsquo; Car-Free Saturday initiative.</div>')}
+          {blend('<div class="text-muted" style="font-size:13px; color:#7A8C99; line-height:1.7;">The event has been rescheduled to <span class="text-cream" style="color:#FFFFFF; font-weight:bold;">January 23, 2027</span>. The adjustment allows us to accommodate an expanded race course in conjunction with the Lima Outlets&rsquo; Car-Free Saturday initiative.</div>')}
         </td></tr>
 
         <tr><td style="padding:24px 28px 0 28px;">
-          {blend('''<div class="text-gold" style="font-family:Courier New, monospace; font-size:11px; letter-spacing:3px; color:#C1121F; text-transform:uppercase; margin-bottom:8px;">Founding Participant Privilege Package</div>
-          <div class="text-muted" style="font-size:12px; color:#5B6B7A; line-height:1.6; margin-bottom:6px;">In recognition of your early registration, we are extending an exclusive package:</div>''')}
+          {blend('''<div class="text-gold" style="font-family:Courier New, monospace; font-size:11px; letter-spacing:3px; color:#FCD116; text-transform:uppercase; margin-bottom:8px;">Founding Participant Privilege Package</div>
+          <div class="text-muted" style="font-size:12px; color:#7A8C99; line-height:1.6; margin-bottom:6px;">In recognition of your early registration, we are extending an exclusive package:</div>''')}
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">{perks_html}</table>
         </td></tr>
 
         <tr><td style="padding:20px 28px 0 28px;">
           {blend(f'''<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Courier New, monospace; font-size:12px;">
-            {detail_row("Bib Code", bib, "text-gold", "#C1121F", first=True)}
+            {detail_row("Bib Code", bib, "text-gold", "#FCD116", first=True)}
             {detail_row("Category", pkg)}
             {detail_row("Status", "Registration valid")}
           </table>''')}
         </td></tr>
 
         <tr><td style="padding:20px 28px 36px 28px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-edge" style="background-color:#F2D45C; background-image:linear-gradient(#F2D45C,#F2D45C); border-radius:14px;"><tr><td style="padding:1px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-bg" style="background-color:#FFF9E0; background-image:linear-gradient(#FFF9E0,#FFF9E0); border-radius:13px;"><tr><td style="padding:16px;">
-              {blend('''<div class="text-muted" style="font-size:12px; color:#5B6B7A; line-height:1.7;">
-                <span class="text-gold" style="color:#C1121F; font-weight:bold;">Payments &amp; refunds.</span> All existing registrations and payments are automatically carried over to the new date and are non-refundable. However, should the event be postponed again and fail to proceed on the subsequent rescheduled date, the corresponding registration payments shall be refunded.<br><br>
-                <span class="text-cream" style="color:#152243; font-weight:bold;">No further action is required on your part.</span>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-edge" style="background-color:#1A3668; background-image:linear-gradient(#1A3668,#1A3668); border-radius:14px;"><tr><td style="padding:1px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-bg" style="background-color:#0F2043; background-image:linear-gradient(#0F2043,#0F2043); border-radius:13px;"><tr><td style="padding:16px;">
+              {blend('''<div class="text-muted" style="font-size:12px; color:#7A8C99; line-height:1.7;">
+                <span class="text-gold" style="color:#FCD116; font-weight:bold;">Payments &amp; refunds.</span> All existing registrations and payments are automatically carried over to the new date and are non-refundable. However, should the event be postponed again and fail to proceed on the subsequent rescheduled date, the corresponding registration payments shall be refunded.<br><br>
+                <span class="text-cream" style="color:#FFFFFF; font-weight:bold;">No further action is required on your part.</span>
               </div>''')}
             </td></tr></table>
           </td></tr></table>
@@ -480,8 +516,8 @@ def send_reschedule_email(to_email, guest_name, bib_code=None, package_name=None
       </table>
     </td></tr>
     <tr><td align="center" style="padding:28px 20px 8px 20px;">
-      {blend('''<div class="text-cream" style="font-size:12px; color:#152243; line-height:1.7;">We appreciate your understanding and continued support.</div>
-      <div class="text-muted" style="font-size:11px; color:#5B6B7A; line-height:1.7; margin-top:8px;">Respectfully, Project Stride 2026 Organizing Committee<br>Lima Estate, Malvar, Batangas &middot; Questions? Reply to this email.</div>''')}
+      {blend('''<div class="text-cream" style="font-size:12px; color:#FFFFFF; line-height:1.7;">We appreciate your understanding and continued support.</div>
+      <div class="text-muted" style="font-size:11px; color:#7A8C99; line-height:1.7; margin-top:8px;">Respectfully, Project Stride 2026 Organizing Committee<br>Lima Estate, Malvar, Batangas &middot; Questions? Reply to this email.</div>''')}
     </td></tr>
   </table>
 </td></tr>
