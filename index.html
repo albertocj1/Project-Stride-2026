@@ -83,6 +83,9 @@ tailwind.config = {
     [data-reveal] { opacity: 1 !important; transform: none !important; }
     .route-path { animation: none !important; }
   }
+  /* Dropdown popups: translucent select backgrounds render as white, hiding the white option text */
+  select { color-scheme: dark; }
+  select option { background-color: #0F2043; color: #FFFFFF; }
 </style>
 </head>
 <body class="bg-stride-chalk text-stride-ink font-sans antialiased overflow-x-hidden">
