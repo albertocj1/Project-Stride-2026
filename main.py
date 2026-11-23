@@ -9,7 +9,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from supabase import Client, create_client
 
-from email_module import send_approval_email, send_pending_reminder_email
+from email_module import send_approval_email, send_pending_reminder_email, send_reschedule_email
 
 EVENT_CAPACITY = int(os.getenv("EVENT_CAPACITY", "2000"))  # 2,000 bib cap
 HOLD_MINUTES = int(os.getenv("HOLD_MINUTES", "15"))        # Unpaid booking hold time
@@ -332,6 +332,35 @@ def approve_booking(booking_id: str, background_tasks: BackgroundTasks):
 def cancel_booking(booking_id: str):
     res = db().table("stride_bookings").update({"status": "cancelled"}).eq("id", booking_id).execute()
     return Booking(**res.data[0])
+
+@app.post("/api/bookings/notify-reschedule", dependencies=[Depends(require_admin)])
+def notify_reschedule(payload: RemindPayload, background_tasks: BackgroundTasks):
+    """Emails the reschedule notice (Jan 23, 2027) to confirmed guests, one per unique email."""
+    query = db().table("stride_bookings").select("*").eq("status", "confirmed")
+    if payload.booking_ids:
+        query = query.in_("id", payload.booking_ids)
+    rows = query.execute().data or []
+
+    unique = {}
+    for row in rows:
+        unique.setdefault(row["email"].lower().strip(), row)
+
+    for email, b in unique.items():
+        background_tasks.add_task(
+            send_reschedule_email,
+            to_email=email,
+            guest_name=b["full_name"],
+            bib_code=b.get("bib_code"),
+            package_name=b["package"],
+            guests=b["guests"],
+        )
+
+    return {
+        "status": "success",
+        "notified_count": len(unique),
+        "total_confirmed_rows": len(rows),
+        "duplicates_skipped": len(rows) - len(unique),
+    }
 
 @app.post("/api/bookings/remind-pending", dependencies=[Depends(require_admin)])
 def remind_pending_bookings(payload: RemindPayload, background_tasks: BackgroundTasks):

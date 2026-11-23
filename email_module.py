@@ -15,8 +15,8 @@ from googleapiclient.discovery import build
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
-EVENT_DATE_LONG = "Saturday, November 28, 2026"
-EVENT_DATE_SHORT = "Nov 28, 2026 &middot; 5:00 AM"
+EVENT_DATE_LONG = "Saturday, January 23, 2027"
+EVENT_DATE_SHORT = "Jan 23, 2027 &middot; 5:00 AM"
 
 # The filename of the logo you provided
 LOGO_PATH = os.environ.get("LOGO_PATH", "442497274_419117694308411_2751438522990521029_n.jpg")
@@ -381,4 +381,157 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
         print(f"Successfully sent pending reminder email to {to_email}")
     except Exception as e:
         print(f"ERROR sending reminder email to {to_email}: {str(e)}")
+        traceback.print_exc()
+
+def send_reschedule_email(to_email, guest_name, bib_code=None, package_name=None, guests=1):
+    """Notifies a confirmed participant that the event moved to January 23, 2027."""
+    from html import escape
+    try:
+        service = get_gmail_service()
+        logo_bytes = _load_logo_bytes()
+        logo_msgid = None
+        logo_cid = None
+        if logo_bytes:
+            logo_msgid = make_msgid(domain="projectstride.ph")
+            logo_cid = logo_msgid[1:-1]
+
+        name = escape(str(guest_name or "Runner"))
+        bib = escape(str(bib_code or "—"))
+        pkg = escape(str(package_name or "—"))
+
+        if logo_cid:
+            wordmark_html = f"""
+          <img src="cid:{logo_cid}" alt="Project Stride" width="140" style="display:block; width:140px; max-width:60%; height:auto; border:0; margin:0 auto; border-radius:50%;">
+          <div style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#7A8C99; text-transform:uppercase; margin-top:10px;">LIMA ESTATE &middot; MALVAR</div>"""
+        else:
+            wordmark_html = """
+          <span style="font-family:'Courier New', monospace; font-size:16px; letter-spacing:4px; color:#FCD116; text-transform:uppercase; font-weight:bold;">PROJECT STRIDE</span>
+          <div style="font-family:'Courier New', monospace; font-size:9px; letter-spacing:3px; color:#7A8C99; text-transform:uppercase; margin-top:6px;">LIMA ESTATE &middot; MALVAR</div>"""
+
+        def perk(title, body):
+            return f"""
+            <tr><td style="padding:10px 0; border-top:1px solid #1A3668;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+                <td width="30" valign="top" style="color:#FCD116; font-size:16px; font-weight:bold;">&#10003;</td>
+                <td style="font-size:13px; line-height:1.5; color:#FFFFFF;"><strong>{title}</strong><br><span style="color:#7A8C99; font-size:12px;">{body}</span></td>
+              </tr></table>
+            </td></tr>"""
+
+        perks_html = (
+            perk("&#8369;500 cash incentive", "Given upon participation on the rescheduled event date.")
+            + perk("Priority race kit claiming", "Skip the line when you pick up your kit.")
+            + perk("Automatic registration transfer", "Your existing registration moves to January 23, 2027 at no additional cost.")
+        )
+
+        html_body = f"""\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+</head>
+<body style="margin:0; padding:0; background-color:#152243; font-family:Arial, Helvetica, sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#152243; padding:32px 12px;">
+<tr><td align="center">
+  <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px; width:100%;">
+    <tr><td align="center" style="padding-bottom:28px;">{wordmark_html}</td></tr>
+    <tr><td style="background-color:#C1121F; border-radius:24px; padding:2px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0F2043; border-radius:22px;">
+        <tr><td align="center" style="padding:36px 32px 8px 32px;">
+          <div style="font-family:'Courier New', monospace; font-size:11px; letter-spacing:3px; color:#FCD116; text-transform:uppercase; margin-bottom:12px;">Important Event Update</div>
+          <div style="font-size:28px; font-weight:bold; color:#FFFFFF; letter-spacing:-0.5px;">We've Moved the Date</div>
+          <div style="font-size:13px; color:#7A8C99; line-height:1.6; padding:14px 8px 0 8px;">
+            Dear {name}, thank you for registering for Project Stride 2026: Fun Run &amp; Duathlon.
+          </div>
+        </td></tr>
+        <tr><td style="padding:24px 32px 8px 32px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#152243; border:1px solid #1A3668; border-radius:16px;">
+            <tr>
+              <td align="center" width="50%" style="padding:18px 8px;">
+                <div style="font-family:'Courier New', monospace; font-size:10px; letter-spacing:2px; color:#7A8C99; text-transform:uppercase;">Original</div>
+                <div style="font-size:15px; color:#7A8C99; text-decoration:line-through; margin-top:6px;">Nov 28, 2026</div>
+              </td>
+              <td align="center" width="50%" style="padding:18px 8px; border-left:1px solid #1A3668;">
+                <div style="font-family:'Courier New', monospace; font-size:10px; letter-spacing:2px; color:#FCD116; text-transform:uppercase;">New Date</div>
+                <div style="font-size:20px; color:#FCD116; font-weight:bold; margin-top:6px;">Jan 23, 2027</div>
+              </td>
+            </tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:16px 32px 0 32px;">
+          <div style="font-size:13px; color:#7A8C99; line-height:1.7;">
+            The event has been rescheduled to <strong style="color:#FFFFFF;">January 23, 2027</strong>. The adjustment allows us to accommodate an expanded race course in conjunction with the Lima Outlets&rsquo; Car-Free Saturday initiative.
+          </div>
+        </td></tr>
+        <tr><td style="padding:24px 32px 0 32px;">
+          <div style="font-family:'Courier New', monospace; font-size:11px; letter-spacing:3px; color:#FCD116; text-transform:uppercase; margin-bottom:8px;">Founding Participant Privilege Package</div>
+          <div style="font-size:12px; color:#7A8C99; line-height:1.6; margin-bottom:6px;">In recognition of your early registration, we are extending an exclusive package:</div>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">{perks_html}</table>
+        </td></tr>
+        <tr><td style="padding:24px 32px 0 32px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:'Courier New', monospace; font-size:12px;">
+            <tr><td style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0;">Bib Code</td><td align="right" style="color:#FCD116; font-weight:bold; padding:8px 0;">{bib}</td></tr>
+            <tr><td style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #1A3668;">Category</td><td align="right" style="color:#FFFFFF; padding:8px 0; border-top:1px solid #1A3668;">{pkg}</td></tr>
+            <tr><td style="color:#7A8C99; text-transform:uppercase; letter-spacing:1px; padding:8px 0; border-top:1px solid #1A3668;">Status</td><td align="right" style="color:#FFFFFF; padding:8px 0; border-top:1px solid #1A3668;">Registration valid</td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:20px 32px 36px 32px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1A3668; border-radius:14px;"><tr><td style="padding:1px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0F2043; border-radius:13px;"><tr><td style="padding:16px;">
+              <div style="font-size:12px; color:#7A8C99; line-height:1.7;">
+                <span style="color:#FCD116; font-weight:bold;">Payments &amp; refunds.</span> All existing registrations and payments are automatically carried over to the new date and are non-refundable. However, should the event be postponed again and fail to proceed on the subsequent rescheduled date, the corresponding registration payments shall be refunded.<br><br>
+                <span style="color:#FFFFFF; font-weight:bold;">No further action is required on your part.</span>
+              </div>
+            </td></tr></table>
+          </td></tr></table>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td align="center" style="padding:28px 20px 8px 20px;">
+      <div style="font-size:12px; color:#FFFFFF; line-height:1.7;">We appreciate your understanding and continued support.</div>
+      <div style="font-size:11px; color:#7A8C99; line-height:1.7; margin-top:8px;">
+        Respectfully, Project Stride 2026 Organizing Committee<br>
+        Lima Estate, Malvar, Batangas &middot; Questions? Reply to this email.
+      </div>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body>
+</html>"""
+
+        text_body = (
+            f"Dear {guest_name},\n\n"
+            "Thank you for registering for Project Stride 2026: Fun Run & Duathlon.\n\n"
+            "Please be informed that the event, originally scheduled for November 28, 2026, has been rescheduled to January 23, 2027.\n\n"
+            "The adjustment will allow us to accommodate an expanded race course in conjunction with the Lima Outlets' Car-Free Saturday initiative.\n\n"
+            "In recognition of your early registration, we are extending an exclusive Founding Participant Privilege Package, which includes:\n"
+            "* P500 cash incentive upon participation on the rescheduled event date;\n"
+            "* Priority race kit claiming; and\n"
+            "* Automatic transfer of your existing registration to January 23, 2027, at no additional cost.\n\n"
+            "Please be advised that all existing registrations and payments shall automatically be carried over to the rescheduled event date and shall be considered non-refundable. "
+            "However, should the event be postponed again and fail to proceed on the subsequent rescheduled date, the corresponding registration payments shall be refunded.\n\n"
+            "Your registration shall remain valid for the rescheduled event. No further action is required on your part.\n\n"
+            "We appreciate your understanding and continued support.\n\n"
+            "Respectfully,\nProject Stride 2026 Organizing Committee"
+        )
+
+        msg = EmailMessage()
+        msg['To'] = to_email
+        msg['From'] = os.environ.get("SENDER_EMAIL", "hello@projectstride.ph")
+        msg['Subject'] = "Important Update: Project Stride 2026 is now January 23, 2027"
+        msg.set_content(text_body)
+        msg.add_alternative(html_body, subtype='html')
+
+        if logo_bytes:
+            html_part = msg.get_payload()[1]
+            html_part.add_related(logo_bytes, maintype='image', subtype='jpeg', cid=logo_msgid, filename='logo.jpg', disposition='inline')
+
+        raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+        service.users().messages().send(userId="me", body={'raw': raw}).execute()
+        print(f"Successfully sent reschedule email to {to_email}")
+    except Exception as e:
+        print(f"ERROR sending reschedule email to {to_email}: {str(e)}")
         traceback.print_exc()

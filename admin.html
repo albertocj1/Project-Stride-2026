@@ -65,6 +65,7 @@
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <button id="remind-pending" title="Send payment reminders to checked pending bookings" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-volt/40 text-stride-volt hover:bg-stride-volt/10 rounded-full px-4 py-2 transition-colors">Remind Pending</button>
+        <button id="notify-reschedule" title="Email the Jan 23, 2027 reschedule notice to confirmed guests" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-ignite/60 text-stride-ignite hover:bg-stride-ignite/10 rounded-full px-4 py-2 transition-colors">Notify Reschedule</button>
         <button id="export-xlsx" title="Full Excel export" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-emerald-400/40 text-emerald-400 hover:bg-emerald-400/10 rounded-full px-4 py-2 transition-colors">Excel Data</button>
         <button id="export-pdf" title="Printable A4 passenger manifest" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-chalk/40 text-stride-chalk hover:bg-white/10 rounded-full px-4 py-2 transition-colors">Export PDF</button>
         <button id="refresh" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-cobalt bg-stride-cobalt text-white hover:bg-stride-ink rounded-full px-4 py-2 transition-colors">Refresh</button>
@@ -252,7 +253,7 @@
 
     const EVENT = {
       name: 'Project Stride 2026',
-      date: 'November 28, 2026',
+      date: 'January 23, 2027',
       venue: 'Lima Estate, Malvar, Batangas',
       boarding: 'Gun Start: 5:00 AM',
     };
@@ -449,7 +450,7 @@
         const badge = STATUS_STYLE[r.status] || 'text-stride-mute border-white/10';
         const canCancel = r.status !== 'cancelled';
         const canApprove = r.status === 'verifying';
-        const canSelect = r.status === 'pending'; // Only pending gets selected for reminders
+        const canSelect = r.status === 'pending' || r.status === 'confirmed'; // pending: reminders, confirmed: reschedule notice
 
         const cbCell = canSelect
           ? `<input type="checkbox" class="row-cb rounded bg-stride-ink border-white/20 accent-stride-volt cursor-pointer w-4 h-4" value="${escapeHtml(r.id)}">`
@@ -567,6 +568,34 @@
         alert('Could not reach server.');
       } finally {
         btn.textContent = 'Remind Pending'; btn.disabled = false;
+      }
+    });
+
+    $('notify-reschedule').addEventListener('click', async () => {
+      const checkedIds = Array.from(document.querySelectorAll('.row-cb:checked')).map(el => el.value);
+      const confirmedRows = allRows.filter(r => r.status === 'confirmed');
+      const targetRows = checkedIds.length ? confirmedRows.filter(r => checkedIds.includes(r.id)) : confirmedRows;
+      if (!targetRows.length) return alert('No confirmed guests to notify.');
+      const emails = new Set(targetRows.map(r => String(r.email).toLowerCase().trim())).size;
+      if (!confirm(`Email the reschedule notice (January 23, 2027) to ${emails} confirmed guest(s)?`)) return;
+
+      const btn = $('notify-reschedule');
+      btn.textContent = 'Sending...'; btn.disabled = true;
+      try {
+        const res = await fetch(`${API_BASE}/api/bookings/notify-reschedule`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+          body: JSON.stringify({ booking_ids: targetRows.map(r => r.id) }),
+        });
+        if (res.status === 401) { showGate(); return; }
+        if (!res.ok) throw new Error('Failed to send');
+        const data = await res.json();
+        alert(`Reschedule notice queued for ${data.notified_count} guest(s).`);
+        render();
+      } catch (e) {
+        alert('Could not send notices.');
+      } finally {
+        btn.textContent = 'Notify Reschedule'; btn.disabled = false;
       }
     });
 
