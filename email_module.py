@@ -22,10 +22,10 @@ EVENT_DATE_SHORT = "Jan 23, 2027 &middot; 5:00 AM"
 LOGO_PATH = os.environ.get("LOGO_PATH", "442497274_419117694308411_2751438522990521029_n.jpg")
 LOGO_URL = None # Leave None to embed the image directly into the email
 
-# Shared styles for every email. The design is LIGHT on purpose: phone mail apps
-# (Gmail iOS especially) convert light emails to dark mode cleanly, while dark
-# emails get their text colours scrambled. Kept in its own block so Gmail, which
-# ignores :root, doesn't affect anything else.
+# Shared styles for every email. The design is LIGHT on purpose, and uses plain
+# background-color (no background-image tricks) so phone dark modes can convert it
+# as a whole: Gmail iOS darkens the backgrounds AND lightens the text together.
+# Blocking background inversion while text still inverts leaves white-on-white.
 EMAIL_STYLE = """<style>
   :root { color-scheme: light dark; supported-color-schemes: light dark; }
 </style>"""
@@ -100,12 +100,12 @@ __STYLE__
 </head>
 <body class="body body-bg" style="margin:0; padding:0; background-color:#F1F4F8; font-family:Arial, Helvetica, sans-serif;">
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); padding:32px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; padding:32px 12px;">
 <tr><td align="center">
   <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%;">
     <tr><td align="center" style="padding-bottom:28px;">__WORDMARK__</td></tr>
-    <tr><td class="card-edge" style="background-color:#C1121F; background-image:linear-gradient(#C1121F,#C1121F); border-radius:24px; padding:2px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border-radius:22px;">
+    <tr><td class="card-edge" style="background-color:#C1121F; border-radius:24px; padding:2px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; border-radius:22px;">
         <tr><td align="center" style="padding:36px 32px 8px 32px;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
             <div class="text-gold" style="width:52px; height:52px; line-height:52px; margin:0 auto 18px auto; border:2px solid #C1121F; border-radius:50%; color:#C1121F; font-size:22px; text-align:center;">&#10003;</div>
@@ -116,7 +116,7 @@ __STYLE__
           </div></div>
         </td></tr>
         <tr><td align="center" style="padding:28px 32px 8px 32px;">
-          <table role="presentation" cellpadding="0" cellspacing="0" class="qr-card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border:1px solid #E2E7EF; border-radius:18px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" class="qr-card-bg" style="background-color:#FFFFFF; border:1px solid #E2E7EF; border-radius:18px;">
             <tr><td align="center" style="padding:16px;">
               <img src="cid:__QR_CID__" alt="Kit Pickup QR code" width="180" height="180" style="display:block; width:180px; height:180px; border:0;">
             </td></tr>
@@ -154,9 +154,9 @@ __STYLE__
           </div></div>
         </td></tr>
         <tr><td style="padding:16px 32px 36px 32px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-edge" style="background-color:#F2D45C; background-image:linear-gradient(#F2D45C,#F2D45C); border-radius:14px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-edge" style="background-color:#F2D45C; border-radius:14px;">
             <tr><td style="padding:1px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-bg" style="background-color:#FFF9E0; background-image:linear-gradient(#FFF9E0,#FFF9E0); border-radius:13px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-bg" style="background-color:#FFF9E0; border-radius:13px;">
                 <tr><td style="padding:16px;">
                   <div class="gmail-blend-screen"><div class="gmail-blend-difference">
                     <div class="text-muted" style="font-size:12px; color:#5B6B7A; line-height:1.6;">
@@ -285,12 +285,12 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
 {EMAIL_STYLE}
 </head>
 <body class="body body-bg" style="margin:0; padding:0; background-color:#F1F4F8; font-family:Arial, Helvetica, sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); padding:32px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; padding:32px 12px;">
 <tr><td align="center">
   <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%;">
     <tr><td align="center" style="padding-bottom:28px;">{wordmark_html}</td></tr>
-    <tr><td class="card-edge" style="background-color:#C1121F; background-image:linear-gradient(#C1121F,#C1121F); border-radius:24px; padding:2px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border-radius:22px;">
+    <tr><td class="card-edge" style="background-color:#C1121F; border-radius:24px; padding:2px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; border-radius:22px;">
         <tr><td align="center" style="padding:36px 32px 24px 32px;">
           <div class="gmail-blend-screen"><div class="gmail-blend-difference">
             <div class="text-gold" style="font-family:'Courier New', monospace; font-size:11px; letter-spacing:3px; color:#C1121F; text-transform:uppercase; margin-bottom:12px;">Payment Reminder</div>
@@ -301,7 +301,7 @@ def send_pending_reminder_email(to_email, guest_name, package_name, guests, tota
           </div></div>
         </td></tr>
         <tr><td style="padding:0 32px 28px 32px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="amount-box-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); border:1px solid #E2E7EF; border-radius:16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="amount-box-bg" style="background-color:#F1F4F8; border:1px solid #E2E7EF; border-radius:16px;">
             <tr><td align="center" style="padding:20px;">
               <div class="gmail-blend-screen"><div class="gmail-blend-difference">
                 <div class="text-muted" style="font-family:'Courier New', monospace; font-size:10px; letter-spacing:2px; color:#5B6B7A; text-transform:uppercase;">Amount Due</div>
@@ -420,12 +420,12 @@ def send_reschedule_email(to_email, guest_name, bib_code=None, package_name=None
 {EMAIL_STYLE}
 </head>
 <body class="body body-bg" style="margin:0; padding:0; background-color:#F1F4F8; font-family:Arial, Helvetica, sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); padding:32px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="body-bg" style="background-color:#F1F4F8; padding:32px 12px;">
 <tr><td align="center">
   <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%;">
     <tr><td align="center" style="padding-bottom:28px;">{wordmark_html}</td></tr>
-    <tr><td class="card-edge" style="background-color:#C1121F; background-image:linear-gradient(#C1121F,#C1121F); border-radius:24px; padding:2px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; background-image:linear-gradient(#FFFFFF,#FFFFFF); border-radius:22px;">
+    <tr><td class="card-edge" style="background-color:#C1121F; border-radius:24px; padding:2px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card-bg" style="background-color:#FFFFFF; border-radius:22px;">
 
         <tr><td align="center" style="padding:36px 28px 8px 28px;">
           {blend(f'''<div class="text-gold" style="font-family:Courier New, monospace; font-size:11px; letter-spacing:3px; color:#C1121F; text-transform:uppercase; margin-bottom:12px;">Important Event Update</div>
@@ -434,7 +434,7 @@ def send_reschedule_email(to_email, guest_name, bib_code=None, package_name=None
         </td></tr>
 
         <tr><td style="padding:24px 28px 8px 28px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="panel-bg" style="background-color:#F1F4F8; background-image:linear-gradient(#F1F4F8,#F1F4F8); border-radius:16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="panel-bg" style="background-color:#F1F4F8; border-radius:16px;">
             <tr>
               <td align="center" width="50%" style="padding:18px 6px;">
                 {blend('''<div class="text-muted" style="font-family:Courier New, monospace; font-size:10px; letter-spacing:2px; color:#5B6B7A; text-transform:uppercase;">Original</div>
@@ -467,8 +467,8 @@ def send_reschedule_email(to_email, guest_name, bib_code=None, package_name=None
         </td></tr>
 
         <tr><td style="padding:20px 28px 36px 28px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-edge" style="background-color:#F2D45C; background-image:linear-gradient(#F2D45C,#F2D45C); border-radius:14px;"><tr><td style="padding:1px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-bg" style="background-color:#FFF9E0; background-image:linear-gradient(#FFF9E0,#FFF9E0); border-radius:13px;"><tr><td style="padding:16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-edge" style="background-color:#F2D45C; border-radius:14px;"><tr><td style="padding:1px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="notice-bg" style="background-color:#FFF9E0; border-radius:13px;"><tr><td style="padding:16px;">
               {blend('''<div class="text-muted" style="font-size:12px; color:#5B6B7A; line-height:1.7;">
                 <span class="text-gold" style="color:#C1121F; font-weight:bold;">Payments &amp; refunds.</span> All existing registrations and payments are automatically carried over to the new date and are non-refundable. However, should the event be postponed again and fail to proceed on the subsequent rescheduled date, the corresponding registration payments shall be refunded.<br><br>
                 <span class="text-cream" style="color:#152243; font-weight:bold;">No further action is required on your part.</span>
