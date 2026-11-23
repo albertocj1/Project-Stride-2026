@@ -198,6 +198,7 @@ __STYLE__
 
 
 def send_approval_email(to_email, guest_name, bib_code, package_name, shirt_size, guests=1):
+    """Sends the confirmation ticket (QR + bib). Returns True if Gmail accepted it."""
     try:
         service = get_gmail_service()
         qr_msgid = make_msgid(domain="projectstride.ph")
@@ -240,9 +241,11 @@ def send_approval_email(to_email, guest_name, bib_code, package_name, shirt_size
         raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
         service.users().messages().send(userId="me", body={'raw': raw}).execute()
         print(f"Successfully sent confirmation email to {to_email}")
+        return True
     except Exception as e:
         print(f"ERROR sending email to {to_email}: {str(e)}")
         traceback.print_exc()
+        return False
 
 
 def send_pending_reminder_email(to_email, guest_name, package_name, guests, total_amount):
