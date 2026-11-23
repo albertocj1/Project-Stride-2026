@@ -9,7 +9,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from supabase import Client, create_client
 
-from email_module import send_approval_email, send_pending_reminder_email, send_reschedule_email
+from email_module import get_gmail_service, send_approval_email, send_pending_reminder_email, send_reschedule_email
 
 EVENT_CAPACITY = int(os.getenv("EVENT_CAPACITY", "2000"))  # 2,000 bib cap
 HOLD_MINUTES = int(os.getenv("HOLD_MINUTES", "15"))        # Unpaid booking hold time
@@ -332,6 +332,45 @@ def approve_booking(booking_id: str, background_tasks: BackgroundTasks):
 def cancel_booking(booking_id: str):
     res = db().table("stride_bookings").update({"status": "cancelled"}).eq("id", booking_id).execute()
     return Booking(**res.data[0])
+
+@app.post("/api/bookings/resend-tickets", dependencies=[Depends(require_admin)])
+def resend_tickets(payload: RemindPayload):
+    """Re-sends the confirmation ticket email to the given confirmed bookings.
+
+    Sends synchronously (not as a background task) so the admin sees exactly which
+    tickets went out and which failed. The admin page sends in small batches.
+    """
+    if not payload.booking_ids:
+        raise HTTPException(status_code=400, detail="No bookings selected.")
+    if len(payload.booking_ids) > 50:
+        raise HTTPException(status_code=400, detail="Send at most 50 tickets per request.")
+
+    # Fail fast with a clear message if Gmail itself is broken.
+    try:
+        get_gmail_service()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Gmail is not working: {e}")
+
+    rows = (db().table("stride_bookings").select("*")
+            .eq("status", "confirmed").in_("id", payload.booking_ids).execute().data or [])
+
+    sent, failed = [], []
+    for b in rows:
+        ok = send_approval_email(
+            to_email=b["email"],
+            guest_name=b["full_name"],
+            bib_code=b["bib_code"],
+            package_name=b["package"],
+            shirt_size=b["shirt_size"],
+            guests=b["guests"],
+        )
+        (sent if ok else failed).append({"id": b["id"], "email": b["email"], "full_name": b["full_name"]})
+
+    return {
+        "sent": sent,
+        "failed": failed,
+        "skipped_not_confirmed": len(payload.booking_ids) - len(rows),
+    }
 
 @app.post("/api/bookings/notify-reschedule", dependencies=[Depends(require_admin)])
 def notify_reschedule(payload: RemindPayload, background_tasks: BackgroundTasks):

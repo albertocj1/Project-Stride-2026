@@ -65,6 +65,7 @@
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <button id="remind-pending" title="Send payment reminders to checked pending bookings" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-volt/40 text-stride-volt hover:bg-stride-volt/10 rounded-full px-4 py-2 transition-colors">Remind Pending</button>
+        <button id="resend-tickets" title="Resend the confirmation ticket (QR + bib) to ticked confirmed bookings, or all confirmed if none are ticked" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-emerald-400/40 text-emerald-400 hover:bg-emerald-400/10 rounded-full px-4 py-2 transition-colors">Resend Tickets</button>
         <button id="notify-reschedule" title="Email the Jan 23, 2027 reschedule notice to confirmed guests" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-ignite/60 text-stride-ignite hover:bg-stride-ignite/10 rounded-full px-4 py-2 transition-colors">Notify Reschedule</button>
         <button id="export-xlsx" title="Full Excel export" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-emerald-400/40 text-emerald-400 hover:bg-emerald-400/10 rounded-full px-4 py-2 transition-colors">Excel Data</button>
         <button id="export-pdf" title="Printable A4 passenger manifest" class="font-mono text-[10px] sm:text-[11px] tracking-widest uppercase border border-stride-chalk/40 text-stride-chalk hover:bg-white/10 rounded-full px-4 py-2 transition-colors">Export PDF</button>
@@ -472,6 +473,9 @@
         if (canCancel) {
            actionButtons += `<button data-edit="${escapeHtml(r.id)}" class="font-mono text-[10px] tracking-widest uppercase text-stride-volt hover:text-white border border-stride-volt/30 hover:border-stride-volt rounded-full px-3 py-1 transition-colors mr-2">Edit</button>`;
         }
+        if (r.status === 'confirmed') {
+           actionButtons += `<button data-resend="${escapeHtml(r.id)}" class="font-mono text-[10px] tracking-widest uppercase text-emerald-400 hover:text-white border border-emerald-400/30 hover:border-emerald-400 rounded-full px-3 py-1 transition-colors mr-2">Resend Ticket</button>`;
+        }
         if (canApprove) {
            actionButtons += `<button data-approve="${escapeHtml(r.id)}" class="font-mono text-[10px] tracking-widest uppercase text-emerald-400 hover:text-white border border-emerald-400/30 hover:border-emerald-400 rounded-full px-3 py-1 transition-colors mr-2">Approve</button>`;
         }
@@ -532,6 +536,10 @@
         container.querySelectorAll('[data-cancel]').forEach((btn) => btn.addEventListener('click', () => cancelBooking(btn.getAttribute('data-cancel'))));
         container.querySelectorAll('[data-approve]').forEach((btn) => btn.addEventListener('click', () => approveBooking(btn.getAttribute('data-approve'))));
         container.querySelectorAll('[data-edit]').forEach((btn) => btn.addEventListener('click', () => openEditModal(btn.getAttribute('data-edit'))));
+        container.querySelectorAll('[data-resend]').forEach((btn) => btn.addEventListener('click', () => {
+          const row = allRows.find((r) => r.id === btn.getAttribute('data-resend'));
+          if (row) resendTickets([row], btn);
+        }));
       });
     }
 
@@ -597,6 +605,54 @@
       } finally {
         btn.textContent = 'Notify Reschedule'; btn.disabled = false;
       }
+    });
+
+    // --- Resend Tickets ---
+    // Sends in batches of 20 so a large backlog doesn't hit a request timeout, and
+    // reports exactly which tickets went out and which failed.
+    async function resendTickets(rows, btn) {
+      const label = btn.textContent;
+      const who = rows.length === 1 ? `${rows[0].full_name} (${rows[0].email})` : `${rows.length} confirmed booking(s)`;
+      if (!confirm(`Resend the confirmation ticket to ${who}?`)) return;
+
+      const BATCH = 20;
+      const sent = [], failed = [];
+      let skipped = 0;
+      btn.disabled = true;
+      try {
+        for (let i = 0; i < rows.length; i += BATCH) {
+          btn.textContent = rows.length > 1 ? `Sending ${i}/${rows.length}...` : 'Sending...';
+          const res = await fetch(`${API_BASE}/api/bookings/resend-tickets`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+            body: JSON.stringify({ booking_ids: rows.slice(i, i + BATCH).map((r) => r.id) }),
+          });
+          if (res.status === 401) { showGate(); return; }
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            // e.g. 503 "Gmail is not working: ..." -- stop, nothing more will send
+            alert(`Stopped: ${data.detail || 'server error'}\n\nSent before stopping: ${sent.length}`);
+            return;
+          }
+          sent.push(...data.sent); failed.push(...data.failed); skipped += data.skipped_not_confirmed || 0;
+        }
+        let msg = `Tickets sent: ${sent.length}`;
+        if (failed.length) msg += `\nFailed: ${failed.length}\n` + failed.map((f) => `  - ${f.full_name} <${f.email}>`).join('\n') + '\n\nCheck the Render logs for the reason.';
+        if (skipped) msg += `\nSkipped (no longer confirmed): ${skipped}`;
+        alert(msg);
+      } catch (e) {
+        alert(`Could not reach the server.\n\nSent before the error: ${sent.length}`);
+      } finally {
+        btn.textContent = label; btn.disabled = false;
+      }
+    }
+
+    $('resend-tickets').addEventListener('click', () => {
+      const checkedIds = Array.from(document.querySelectorAll('.row-cb:checked')).map((el) => el.value);
+      const confirmedRows = allRows.filter((r) => r.status === 'confirmed');
+      const targetRows = checkedIds.length ? confirmedRows.filter((r) => checkedIds.includes(r.id)) : confirmedRows;
+      if (!targetRows.length) return alert('No confirmed bookings to send tickets to.');
+      resendTickets(targetRows, $('resend-tickets'));
     });
 
     async function approveBooking(id) {
