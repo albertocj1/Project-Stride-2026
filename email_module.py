@@ -22,21 +22,25 @@ EVENT_DATE_SHORT = "Jan 23, 2027 &middot; 5:00 AM"
 LOGO_PATH = os.environ.get("LOGO_PATH", "442497274_419117694308411_2751438522990521029_n.jpg")
 LOGO_URL = None # Leave None to embed the image directly into the email
 
-# Shared <style> for every email. The design is dark by default, so the goal is to
+# Shared styles for every email. The design is dark by default, so the goal is to
 # stop phone mail apps from "helpfully" inverting it in dark mode:
-#  - background-image gradients: Gmail won't invert backgrounds set this way
+#  - background-image gradients (inline): Gmail won't invert backgrounds set this way
 #  - gmail-blend-* wrappers: undo Gmail iOS/Android text-colour inversion
-#  - [data-ogsc]/[data-ogsb]: pin colours in Outlook's dark mode
 #  - prefers-color-scheme: pin colours in Apple Mail / iOS Mail
+#  - [data-ogsc]/[data-ogsb]: pin colours in Outlook's dark mode
+# Each lives in its OWN <style> block: Gmail throws away an entire block if it contains
+# anything it doesn't support (attribute selectors, :root), which would take the
+# Gmail fixes down with it.
 EMAIL_STYLE = """<style>
-  :root { color-scheme: dark; supported-color-schemes: dark; }
-  body, table, td, div { -webkit-text-size-adjust:100%; }
   u + .body .gmail-blend-screen     { background:#000000; mix-blend-mode:screen; }
   u + .body .gmail-blend-difference { background:#000000; mix-blend-mode:difference; }
-  u + .body .text-gold  { color:#FCD116 !important; border-color:#FCD116 !important; }
-  u + .body .text-cream { color:#FFFFFF !important; }
-  u + .body .text-muted { color:#7A8C99 !important; }
+  u + .body .text-gold   { color:#FCD116 !important; border-color:#FCD116 !important; }
+  u + .body .text-cream  { color:#FFFFFF !important; }
+  u + .body .text-muted  { color:#7A8C99 !important; }
   u + .body .text-amount { color:#FCD116 !important; }
+</style>
+<style>
+  :root { color-scheme: dark; supported-color-schemes: dark; }
   @media (prefers-color-scheme: dark) {
     .body-bg       { background-color:#152243 !important; }
     .card-edge     { background-color:#C1121F !important; }
@@ -49,6 +53,8 @@ EMAIL_STYLE = """<style>
     .text-muted    { color:#7A8C99 !important; }
     .text-gold, .text-amount { color:#FCD116 !important; }
   }
+</style>
+<style>
   [data-ogsb] .body-bg   { background-color:#152243 !important; }
   [data-ogsb] .card-edge { background-color:#C1121F !important; }
   [data-ogsb] .card-bg, [data-ogsb] .notice-bg { background-color:#0F2043 !important; }
