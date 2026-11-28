@@ -322,7 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return '';
     }
 
-    // --- Live Availability / Scarcity Bar ---
+    // --- Live Availability ---
+    // The scarcity bar was removed from the page; the element lookups below are
+    // null-safe, and this still disables the form when the race sells out.
     async function loadAvailability() {
         const takenEl = $('spots-taken');
         const capEl = $('spots-capacity');
